@@ -34,7 +34,7 @@ def buil_model(args):
 def warm_up_one_epoch(model, train_loader, opt):
     for idx, (x, y) in enumerate(train_loader):
         x,y = x.to(device), y.to(device)
-        y_pred = model(x)
+        y_pred, _ = model(x)
         loss = torch.nn.functional.mse_loss(y, y_pred)
         opt.zero_grad()
         loss.backward()
@@ -48,14 +48,26 @@ def train_one_epoch(model, train_loader, opt):
     model.train()
     for idx, (x,y) in enumerate(train_loader):
         x,y = x.to(device), y.to(device)
-        y_pred = model(x)
+        y_pred, _ = model(x)
         loss = torch.nn.functional.mse_loss(y, y_pred)
         opt.zero_grad()
         loss.backward()
         opt.step()
-    ##################################
+    return model
+   
+
+##################################
+# return the prototype of each label
+def cal_prototype(model, train_loader):
     model.eval()
     with torch.no_grad():
-        feat_label = {}
+        label_feat, proto = {}, []
         for idx, (x,y) in enumerate(train_loader):
             x,y = x.to(device), y.to(device)
+            _, z_pred = model(x)
+            for l in y.unique(sort=True):
+                rows = z_pred[y == l]
+                keys = int(l.item())
+                label_feat[keys] = label_feat.get(keys, []) + list(rows.unbind(0))
+        proto = [torch.mean(label_feat[e], 0) for e in label_feat.keys()]
+    return proto
