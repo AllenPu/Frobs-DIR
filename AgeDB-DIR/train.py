@@ -11,24 +11,46 @@ import torch.nn as nn
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
 from tensorboard_logger import Logger
+
+
 from resnet import *
-
-
 from utils import *
+from agedb import *
 
 import os
 os.environ["KMP_WARNINGS"] = "FALSE"
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], help='dataset name')
+parser.add_argument('--data_dir', type=str, default='./data', help='data directory')
 
 
 
-
-def buil_model(args):
+def build_model(args):
     return resnet18()
 
 
+
+def load_datasets(args):
+    df = pd.read_csv(os.path.join(args.data_dir, f"{args.dataset}.csv"))
+    df_train, df_val, df_test = df[df['split'] == 'train'], df[df['split'] == 'val'], df[df['split'] == 'test']
+    train_labels = df_train['age']
+
+    train_dataset = AgeDB(data_dir=args.data_dir, df=df_train, img_size=224, split='train')
+    val_dataset = AgeDB(data_dir=args.data_dir, df=df_val, img_size=224, split='val')
+    test_dataset = AgeDB(data_dir=args.data_dir, df=df_test, img_size=224, split='test')
+
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
+                              num_workers=args.workers, pin_memory=True, drop_last=False)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
+                            num_workers=args.workers, pin_memory=True, drop_last=False)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
+                             num_workers=args.workers, pin_memory=True, drop_last=False)
+    print(f"Training data size: {len(train_dataset)}")
+    print(f"Validation data size: {len(val_dataset)}")
+    print(f"Test data size: {len(test_dataset)}")
+    return train_loader, val_loader, test_loader, train_labels
 
 
 def warm_up_one_epoch(model, train_loader, opt):
@@ -71,3 +93,9 @@ def cal_prototype(model, train_loader):
                 label_feat[keys] = label_feat.get(keys, []) + list(rows.unbind(0))
         proto = [torch.mean(label_feat[e], 0) for e in label_feat.keys()]
     return proto
+
+
+
+if __name__ == "main":
+    args, unknown = parser.parse_known_args()
+    model = build_model(args)
