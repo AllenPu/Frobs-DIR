@@ -11,6 +11,7 @@ import torch.nn as nn
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
 from tensorboard_logger import Logger
+from resnet import *
 
 
 from utils import *
@@ -25,7 +26,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
 
 
 def buil_model(args):
-    
+    return resnet18()
 
 
 

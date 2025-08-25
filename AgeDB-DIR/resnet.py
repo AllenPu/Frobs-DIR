@@ -72,8 +72,8 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, fds, bucket_num, bucket_start, start_update, start_smooth,
-                 kernel, ks, sigma, momentum, dropout=None):
+    def __init__(self, block, layers, fds=False, bucket_num=100, bucket_start=3, start_update=0, start_smooth=1,
+                 kernel='gaussian', ks=9, sigma=1, momentum=0.9, dropout=None):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
@@ -147,10 +147,11 @@ class ResNet(nn.Module):
             encoding_s = self.dropout(encoding_s)
         x = self.linear(encoding_s)
 
-        if self.training and self.fds:
-            return x, encoding
-        else:
-            return x
+        #if self.training and self.fds:
+        #    return x, encoding
+        #else:
+        #    return x
+        return x, encoding
 
 
 def resnet50(**kwargs):
