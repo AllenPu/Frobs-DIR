@@ -24,6 +24,9 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
 
 
 
+def buil_model(args):
+    
+
 
 
 
@@ -36,3 +39,22 @@ def warm_up_one_epoch(model, train_loader, opt):
         loss.backward()
         opt.step()
     return model
+
+
+
+def train_one_epoch(model, train_loader, opt):
+    ##################################
+    model.train()
+    for idx, (x,y) in enumerate(train_loader):
+        x,y = x.to(device), y.to(device)
+        y_pred = model(x)
+        loss = torch.nn.functional.mse_loss(y, y_pred)
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
+    ##################################
+    model.eval()
+    with torch.no_grad():
+        feat_label = {}
+        for idx, (x,y) in enumerate(train_loader):
+            x,y = x.to(device), y.to(device)
