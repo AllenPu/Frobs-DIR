@@ -99,3 +99,4 @@ def cal_prototype(model, train_loader):
 if __name__ == "main":
     args, unknown = parser.parse_known_args()
     model = build_model(args)
+    train_loader, val_loader, test_laoder, train_labels = load_datasets(args)
