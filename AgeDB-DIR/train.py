@@ -8,6 +8,7 @@ from scipy.stats import gmean
 
 import torch
 import torch.nn as nn
+import torch.optim as optim
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
 from tensorboard_logger import Logger
@@ -24,6 +25,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], help='dataset name')
 parser.add_argument('--data_dir', type=str, default='./data', help='data directory')
+parser.add_argument('--warm_up_epoch', type=int, default=30)
+parser.add_argument('--epoch', type=int, default=70)
 
 
 
@@ -100,3 +103,8 @@ if __name__ == "main":
     args, unknown = parser.parse_known_args()
     model = build_model(args)
     train_loader, val_loader, test_laoder, train_labels = load_datasets(args)
+    opt = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    for e in range(args.warm_up_epoch):
+        model = warm_up_one_epoch(model, train_loader, opt)
+    for e in range(args.epoch):
+        model = train_one_epoch(model, train_loader, opt)
