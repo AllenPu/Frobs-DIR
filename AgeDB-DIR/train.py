@@ -79,7 +79,7 @@ def train_one_epoch(model, train_loader, opt):
         y_pred, _ = model(x)
         loss_mse = torch.nn.functional.mse_loss(y, y_pred)
 
-        
+
 
         loss += loss_mse
         opt.zero_grad()
@@ -115,3 +115,7 @@ if __name__ == "main":
         model = warm_up_one_epoch(model, train_loader, opt)
     for e in range(args.epoch):
         model = train_one_epoch(model, train_loader, opt)
+
+    #
+    #
+    # to do : calcualte the distance between the majority and minority
