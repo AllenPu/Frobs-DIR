@@ -31,7 +31,7 @@ parser.add_argument('--epoch', type=int, default=70)
 
 
 def build_model(args):
-    return resnet18()
+    return resnet50()
 
 
 
