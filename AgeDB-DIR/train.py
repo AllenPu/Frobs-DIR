@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
-from tensorboard_logger import Logger
+#from tensorboard_logger import Logger
 
 
 from resnet import *
@@ -69,12 +69,19 @@ def warm_up_one_epoch(model, train_loader, opt):
 
 
 def train_one_epoch(model, train_loader, opt):
+    loss = 0
+    ##################################
+    proto = cal_prototype(model, train_loader)
     ##################################
     model.train()
     for idx, (x,y) in enumerate(train_loader):
         x,y = x.to(device), y.to(device)
         y_pred, _ = model(x)
-        loss = torch.nn.functional.mse_loss(y, y_pred)
+        loss_mse = torch.nn.functional.mse_loss(y, y_pred)
+
+        
+
+        loss += loss_mse
         opt.zero_grad()
         loss.backward()
         opt.step()
