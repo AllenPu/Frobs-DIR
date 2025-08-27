@@ -40,6 +40,7 @@ if __name__ == "main":
     # [label, feature]
     proto_list = torch.stack(protos)
     distances = torch.norm(protos[1:] - protos[:-1], dim=1)
+    print('======================')
     print(distances.tolist())
     print(list(protos.keys()))
             
