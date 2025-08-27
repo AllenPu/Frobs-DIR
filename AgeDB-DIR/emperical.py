@@ -1,9 +1,13 @@
 from resnet import resnet50
 import torch
 from collections import OrderedDict
-from train import load_datasets
+from train import load_datasets, cal_prototype
 import argparse
 import os
+
+
+
+
 os.environ["KMP_WARNINGS"] = "FALSE"
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -29,3 +33,14 @@ def load_model():
 if __name__ == "main":
     args, unknown = parser.parse_known_args()
     train_loader, val_loader, test_loader, train_lables = load_datasets(args)
+    model = load_model().to(device)
+    model.eval()
+    label_feat = {}
+    protos = cal_prototype(model, test_loader)
+    # [label, feature]
+    proto_list = torch.stack(protos)
+    distances = torch.norm(protos[1:] - protos[:-1], dim=1)
+    print(distances.tolist())
+    print(list(protos.keys()))
+            
+    
