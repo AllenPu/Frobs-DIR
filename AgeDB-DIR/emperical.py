@@ -43,6 +43,7 @@ if __name__ == '__main__':
     model.eval()
     protos = cal_prototype(model, test_loader)
     # [feature]
+    protos = torch.stack(protos, dim=0)
     distances = torch.norm(protos[1:] - protos[:-1], dim=1)
     print('======================')
     print(distances.tolist())
