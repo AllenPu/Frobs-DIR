@@ -99,7 +99,7 @@ def cal_prototype(model, train_loader):
         for idx, (x,y, _) in enumerate(train_loader):
             x,y = x.to(device), y.to(device)
             _, z_pred = model(x)
-            for l in torch.unique(y, sort=True):
+            for l in y.unique(sorted=True):
                 rows = z_pred[y == l]
                 keys = int(l.item())
                 label_feat[keys] = label_feat.get(keys, []) + list(rows.unbind(0))
