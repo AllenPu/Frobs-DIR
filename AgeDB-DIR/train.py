@@ -107,7 +107,7 @@ def cal_prototype(model, train_loader):
 
 
 if __name__ == "main":
-    args, unknown = parser.parse_known_args()
+    args = parser.parse_args()
     model = build_model(args)
     train_loader, val_loader, test_laoder, train_labels = load_datasets(args)
     opt = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
