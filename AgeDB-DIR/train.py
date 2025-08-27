@@ -33,7 +33,7 @@ parser.add_argument('--epoch', type=int, default=70)
 
 
 def build_model(args):
-    return resnet50()
+    return Regression(name='resnet18')
 
 
 
@@ -96,7 +96,7 @@ def cal_prototype(model, train_loader):
     model.eval()
     with torch.no_grad():
         label_feat, proto = {}, []
-        for idx, (x,y) in enumerate(train_loader):
+        for idx, (x,y, _) in enumerate(train_loader):
             x,y = x.to(device), y.to(device)
             _, z_pred = model(x)
             for l in y.unique(sort=True):
