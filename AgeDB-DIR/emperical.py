@@ -31,7 +31,7 @@ def load_model():
 
 
 
-if __name__ == "main":
+if __name__ == '__main__':
     print('start')
     args = parser.parse_args()
     print('load hyper-param')
