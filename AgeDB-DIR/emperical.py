@@ -19,7 +19,7 @@ parser.add_argument('--data_dir', type=str, default='./data', help='data directo
 # load the pretrained model on contrastive learning
 def load_model():
     model = resnet50()
-    ckpt = torch.load('last.pthmodel_name')
+    ckpt = torch.load('/home/rpu2/scratch/code/imbalanced-contrastive-ordinary-regression/agedb/models/last.pth')
     new_state_dict = OrderedDict()
     for k,v in ckpt['model'].items():
         key = k.replace('module.','')
