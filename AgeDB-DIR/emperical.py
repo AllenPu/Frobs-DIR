@@ -10,6 +10,7 @@ import os
 
 os.environ["KMP_WARNINGS"] = "FALSE"
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print("device is ", device)
 
 
 parser = argparse.ArgumentParser('argument for training')
