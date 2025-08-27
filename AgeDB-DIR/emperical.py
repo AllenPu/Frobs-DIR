@@ -27,7 +27,7 @@ def load_model():
         key = k.replace('module.','')
         keys = key.replace('encoder.','')
         new_state_dict[keys] =  v
-    model.load_state_dict(new_state_dict) 
+    model.encoder.load_state_dict(new_state_dict) 
     return model
 
 
