@@ -1,4 +1,4 @@
-from resnet import resnet50
+from resnet import *
 import torch
 from collections import OrderedDict
 from train import load_datasets, cal_prototype
@@ -20,7 +20,7 @@ parser.add_argument('--batch_size', type=int, default=128)
 
 # load the pretrained model on contrastive learning
 def load_model():
-    model = resnet50()
+    model = Regression()
     ckpt = torch.load('/home/rpu2/scratch/code/imbalanced-contrastive-ordinary-regression/agedb/models/last.pth')
     new_state_dict = OrderedDict()
     for k,v in ckpt['model'].items():

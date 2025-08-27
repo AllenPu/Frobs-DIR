@@ -2,6 +2,8 @@ import logging
 import math
 import torch.nn as nn
 from fds import FDS
+import torch
+import torch.nn.functional as F
 
 print = logging.info
 
@@ -147,11 +149,11 @@ class ResNet(nn.Module):
             encoding_s = self.dropout(encoding_s)
         x = self.linear(encoding_s)
 
-        #if self.training and self.fds:
-        #    return x, encoding
-        #else:
-        #    return x
-        return x, encoding
+        if self.training and self.fds:
+            return x, encoding
+        else:
+            return x
+        
 
 
 def resnet50(**kwargs):
@@ -160,3 +162,30 @@ def resnet50(**kwargs):
 
 def resnet18(**kwargs):
     return ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
+
+
+model_dict = {
+    'resnet18': [resnet18, 512],
+    'resnet50': [resnet50, 2048]
+}
+
+
+
+class Regression(nn.Module):
+    def __init__(self, name='resnet50', feature_norm=False, weight_norm= False):
+        super(Regression, self).__init__()
+        backbone, dim_in = model_dict[name]
+        self.encoder = backbone()
+        self.feature_norm = feature_norm
+        self.weight_norm = weight_norm
+        if self.weight_norm:
+            self.regressor = torch.nn.utils.weight_norm(nn.Linear(dim_in, 1), name='weight')
+        else:
+            self.regressor = nn.Sequential(nn.Linear(dim_in, 1))
+
+    def forward(self, x):
+        feat = self.encoder(x)
+        if self.feature_norm:
+            feat = F.normalize(feat, dim=-1)
+        pred = self.regressor(feat)
+        return pred, feat
