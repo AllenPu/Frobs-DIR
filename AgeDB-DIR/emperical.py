@@ -41,12 +41,14 @@ if __name__ == '__main__':
     model = load_model().to(device)
     print('model loaded')
     model.eval()
-    proto = cal_prototype(model, test_loader)
+    proto, labels = cal_prototype(model, test_loader)
     # [feature]
     protos = torch.stack(proto, dim=0)
-    distances = torch.norm(protos[1:] - protos[:-1], dim=1)
+    distances = torch.norm(protos[1:] - protos[:-1], dim=1).tolist()
     print('======================')
-    print(distances.tolist())
-    print(list(protos.keys()))
+    with open('dis.txt', 'a') as f:
+        f.write(distances+ '\n')
+        f.write(labels+ '\n')
+    
             
     
