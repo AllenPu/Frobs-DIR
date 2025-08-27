@@ -31,7 +31,9 @@ def load_model():
 
 
 if __name__ == "main":
+    print('start')
     args, unknown = parser.parse_known_args()
+    print('load hyper-param')
     train_loader, val_loader, test_loader, train_lables = load_datasets(args)
     print('data loaded')
     model = load_model().to(device)
