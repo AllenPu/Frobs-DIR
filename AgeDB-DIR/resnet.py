@@ -9,15 +9,16 @@ print = logging.info
 
 
 def conv3x3(in_planes, out_planes, stride=1):
-    """3x3 convolution with padding"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
 
 
 class BasicBlock(nn.Module):
     expansion = 1
 
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
+    def __init__(self, inplanes, planes, stride=1, downsample=None, base_width=64):
         super(BasicBlock, self).__init__()
+        if base_width != 64:
+            raise ValueError("BasicBlock only supports groups=1 and base_width=64")
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm2d(planes)
         self.relu = nn.ReLU(inplace=True)
@@ -43,13 +44,14 @@ class BasicBlock(nn.Module):
 class Bottleneck(nn.Module):
     expansion = 4
 
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
+    def __init__(self, inplanes, planes, stride=1, downsample=None, base_width=64):
         super(Bottleneck, self).__init__()
-        self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(planes)
-        self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
+        width = int(planes * (base_width / 64.0))
+        self.conv1 = nn.Conv2d(inplanes, width, kernel_size=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(width)
+        self.conv2 = nn.Conv2d(width, width, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(width)
+        self.conv3 = nn.Conv2d(width, planes * 4, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(planes * 4)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
@@ -70,15 +72,15 @@ class Bottleneck(nn.Module):
         out += residual
         out = self.relu(out)
         return out
-
+    
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, fds=False, bucket_num=100, bucket_start=3, start_update=0, start_smooth=1,
-                 kernel='gaussian', ks=9, sigma=1, momentum=0.9, dropout=None):
+    def __init__(self, block, layers, in_channel=3, dropout=None, width_per_group=64):
         self.inplanes = 64
         super(ResNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.base_width = width_per_group
+        self.conv1 = nn.Conv2d(in_channel, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
@@ -87,15 +89,6 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.linear = nn.Linear(512 * block.expansion, 1)
-
-        if fds:
-            self.FDS = FDS(
-                feature_dim=512 * block.expansion, bucket_num=bucket_num, bucket_start=bucket_start,
-                start_update=start_update, start_smooth=start_smooth, kernel=kernel, ks=ks, sigma=sigma, momentum=momentum
-            )
-        self.fds = fds
-        self.start_smooth = start_smooth
 
         self.use_dropout = True if dropout else False
         if self.use_dropout:
@@ -109,7 +102,7 @@ class ResNet(nn.Module):
             elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
-
+        
     def _make_layer(self, block, planes, blocks, stride=1):
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
@@ -119,14 +112,14 @@ class ResNet(nn.Module):
                 nn.BatchNorm2d(planes * block.expansion),
             )
         layers = []
-        layers.append(block(self.inplanes, planes, stride, downsample))
+        layers.append(block(self.inplanes, planes, stride, downsample, self.base_width))
         self.inplanes = planes * block.expansion
         for i in range(1, blocks):
-            layers.append(block(self.inplanes, planes))
+            layers.append(block(self.inplanes, planes, base_width=self.base_width))
 
         return nn.Sequential(*layers)
 
-    def forward(self, x, targets=None, epoch=None):
+    def forward(self, x):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -137,24 +130,13 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
         x = self.avgpool(x)
-        encoding = x.view(x.size(0), -1)
+        x = torch.flatten(x, 1)
 
-        encoding_s = encoding
+        return x
+    
 
-        if self.training and self.fds:
-            if epoch >= self.start_smooth:
-                encoding_s = self.FDS.smooth(encoding_s, targets, epoch)
 
-        if self.use_dropout:
-            encoding_s = self.dropout(encoding_s)
-        x = self.linear(encoding_s)
-
-        if self.training and self.fds:
-            return x, encoding
-        else:
-            return x
-        
-
+    
 
 def resnet50(**kwargs):
     return ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
