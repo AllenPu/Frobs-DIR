@@ -47,8 +47,13 @@ if __name__ == '__main__':
     distances = torch.norm(protos[1:] - protos[:-1], dim=1).tolist()
     print('======================')
     with open('dis.txt', 'a') as f:
-        f.write(distances+ '\n')
-        f.write(labels+ '\n')
+        for e in distances:
+            f.write(str(e) + '\n')
+        f.close()
+    with open('label.txt', 'a') as f:
+        for e in labels:
+            f.write(str(e) + '\n')
+        f.close()
     
             
     
