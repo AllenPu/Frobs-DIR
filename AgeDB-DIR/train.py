@@ -105,6 +105,7 @@ def cal_prototype(model, train_loader):
                 rows = z_pred[index]
                 keys = int(l.item())
                 label_feat[keys] = label_feat.get(keys, []) + list(rows.unbind(0))
+                print('shape ', label_feat[keys])
         proto = [torch.mean(label_feat[e], 0) for e in label_feat.keys()]
     return proto
 
