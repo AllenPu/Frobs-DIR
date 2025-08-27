@@ -26,6 +26,7 @@ print("device is ", device)
 parser = argparse.ArgumentParser('argument for training')
 parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], help='dataset name')
 parser.add_argument('--data_dir', type=str, default='/home/rpu2/scratch/data/imbalanced-regression/agedb-dir/data', help='data directory')
+parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('--warm_up_epoch', type=int, default=30)
 parser.add_argument('--epoch', type=int, default=70)
 
@@ -46,11 +47,11 @@ def load_datasets(args):
     test_dataset = AgeDB(data_dir=args.data_dir, df=df_test, img_size=224, split='test')
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                              num_workers=args.workers, pin_memory=True, drop_last=False)
+                              num_workers=8, pin_memory=True, drop_last=False)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
-                            num_workers=args.workers, pin_memory=True, drop_last=False)
+                            num_workers=8, pin_memory=True, drop_last=False)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
-                             num_workers=args.workers, pin_memory=True, drop_last=False)
+                             num_workers=8, pin_memory=True, drop_last=False)
     print(f"Training data size: {len(train_dataset)}")
     print(f"Validation data size: {len(val_dataset)}")
     print(f"Test data size: {len(test_dataset)}")

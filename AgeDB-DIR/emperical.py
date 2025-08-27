@@ -16,6 +16,7 @@ print("device is ", device)
 parser = argparse.ArgumentParser('argument for training')
 parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], help='dataset name')
 parser.add_argument('--data_dir', type=str, default='/home/rpu2/scratch/data/imbalanced-regression/agedb-dir/data', help='data directory')
+parser.add_argument('--batch_size', type=int, default=128)
 
 # load the pretrained model on contrastive learning
 def load_model():
