@@ -100,8 +100,9 @@ def cal_prototype(model, train_loader):
             x,y = x.to(device), y.to(device)
             _, z_pred = model(x)
             for l in y.unique(sorted=True):
-                print(f'======= l {l} ========')
-                rows = z_pred[y == l]
+                index = y==l
+                index = index.squeeze(-1)
+                rows = z_pred[index]
                 keys = int(l.item())
                 label_feat[keys] = label_feat.get(keys, []) + list(rows.unbind(0))
         proto = [torch.mean(label_feat[e], 0) for e in label_feat.keys()]
