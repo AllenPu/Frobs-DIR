@@ -44,7 +44,8 @@ if __name__ == '__main__':
     label_feat = {}
     protos = cal_prototype(model, test_loader)
     # [feature]
-    #proto_list = torch.stack(protos)
+    print(protos)
+    proto_list = torch.stack(protos, dim=0)
     distances = torch.norm(protos[1:] - protos[:-1], dim=1)
     print('======================')
     print(distances.tolist())
