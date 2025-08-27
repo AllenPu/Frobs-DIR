@@ -14,7 +14,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], help='dataset name')
-parser.add_argument('--data_dir', type=str, default='./data', help='data directory')
+parser.add_argument('--data_dir', type=str, default='/home/rpu2/scratch/data/imbalanced-regression/agedb-dir/data', help='data directory')
 
 # load the pretrained model on contrastive learning
 def load_model():
