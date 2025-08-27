@@ -95,7 +95,7 @@ def train_one_epoch(model, train_loader, opt):
 def cal_prototype(model, train_loader):
     model.eval()
     with torch.no_grad():
-        label_feat, proto, labels = {}, [], []
+        label_feat, proto = {}, []
         for idx, (x,y, _) in enumerate(train_loader):
             x,y = x.to(device), y.to(device)
             _, z_pred = model(x)
@@ -104,11 +104,11 @@ def cal_prototype(model, train_loader):
                 index = index.squeeze(-1)
                 rows = z_pred[index]
                 keys = int(l.item())
-                labels.append(keys)
                 label_feat[keys] = label_feat.get(keys, []) + list(rows.unbind(0))
                 #print('shape ', label_feat[keys])
         proto = [torch.stack(label_feat[e], dim=0) for e in label_feat.keys()]
         proto = [torch.mean(p, 0) for p in proto]
+        labels = [k for k in label_feat.keys()]
     return proto, labels
 
 
