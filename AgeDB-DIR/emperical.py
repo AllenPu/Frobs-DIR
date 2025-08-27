@@ -20,7 +20,7 @@ parser.add_argument('--batch_size', type=int, default=128)
 
 # load the pretrained model on contrastive learning
 def load_model():
-    model = Regression()
+    model = Regression(name='resnet18')
     ckpt = torch.load('/home/rpu2/scratch/code/imbalanced-contrastive-ordinary-regression/agedb/models/last.pth')
     new_state_dict = OrderedDict()
     for k,v in ckpt['model'].items():
