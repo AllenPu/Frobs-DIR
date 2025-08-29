@@ -76,13 +76,10 @@ def train_one_epoch(model, train_loader, opt):
     proto = cal_prototype(model, train_loader)
     ##################################
     model.train()
-    for idx, (x,y) in enumerate(train_loader):
+    for idx, (x,y, w) in enumerate(train_loader):
         x,y = x.to(device), y.to(device)
         y_pred, _ = model(x)
         loss_mse = torch.nn.functional.mse_loss(y, y_pred)
-
-
-
         loss += loss_mse
         opt.zero_grad()
         loss.backward()
@@ -119,8 +116,8 @@ if __name__ == '__main__':
     model = build_model(args)
     train_loader, val_loader, test_laoder, train_labels = load_datasets(args)
     opt = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
-    for e in range(args.warm_up_epoch):
-        model = warm_up_one_epoch(model, train_loader, opt)
+    #for e in range(args.warm_up_epoch):
+    #    model = warm_up_one_epoch(model, train_loader, opt)
     for e in range(args.epoch):
         model = train_one_epoch(model, train_loader, opt)
 
