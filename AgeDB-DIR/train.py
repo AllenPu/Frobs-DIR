@@ -124,6 +124,7 @@ if __name__ == '__main__':
     for e in range(args.epoch):
         model = train_one_epoch(model, train_loader, opt)
 
+# this can be written for SDE-EDG
     #
     #
     # to do : calcualte the distance between the majority and minority
