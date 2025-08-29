@@ -29,7 +29,7 @@ parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], h
 parser.add_argument('--data_dir', type=str, default='/home/rpu2/scratch/data/imbalanced-regression/agedb-dir/data', help='data directory')
 parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('--warm_up_epoch', type=int, default=30)
-parser.add_argument('--epoch', type=int, default=70)
+parser.add_argument('--epoch', type=int, default=100)
 
 
 
