@@ -75,8 +75,8 @@ def train_one_epoch(model, train_loader, opt):
     #proto = cal_prototype(model, train_loader)
     ##################################
     model.train()
-    loss = 0
     for idx, (x,y, w) in enumerate(train_loader):
+        loss = 0
         x,y = x.to(device), y.to(device)
         y_pred, _ = model(x)
         loss_mse = torch.nn.functional.mse_loss(y, y_pred)
