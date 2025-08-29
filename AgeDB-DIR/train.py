@@ -5,6 +5,7 @@ from tqdm import tqdm
 import pandas as pd
 from collections import defaultdict
 from scipy.stats import gmean
+from tqdm import tqdm
 
 import torch
 import torch.nn as nn
@@ -118,7 +119,7 @@ if __name__ == '__main__':
     opt = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     #for e in range(args.warm_up_epoch):
     #    model = warm_up_one_epoch(model, train_loader, opt)
-    for e in range(args.epoch):
+    for e in tqdm(range(args.epoch)):
         model = train_one_epoch(model, train_loader, opt)
     torch.save(model, './MSE,pth')
 # this can be written for SDE-EDG
