@@ -113,14 +113,14 @@ def cal_prototype(model, train_loader):
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    model = build_model(args)
+    model = build_model(args).to(device)
     train_loader, val_loader, test_laoder, train_labels = load_datasets(args)
     opt = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     #for e in range(args.warm_up_epoch):
     #    model = warm_up_one_epoch(model, train_loader, opt)
     for e in range(args.epoch):
         model = train_one_epoch(model, train_loader, opt)
-
+    torch.save(model, './MSE,pth')
 # this can be written for SDE-EDG
     #
     #
