@@ -71,11 +71,11 @@ def warm_up_one_epoch(model, train_loader, opt):
 
 
 def train_one_epoch(model, train_loader, opt):
-    loss = 0
     ##################################
     #proto = cal_prototype(model, train_loader)
     ##################################
     model.train()
+    loss = 0
     for idx, (x,y, w) in enumerate(train_loader):
         x,y = x.to(device), y.to(device)
         y_pred, _ = model(x)
