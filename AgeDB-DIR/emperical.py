@@ -75,7 +75,7 @@ if __name__ == '__main__':
     # [feature]
     protos = torch.stack(proto, dim=0).tolist()
     #
-    draw_tsne(protos, 'SuperCR')
+    draw_tsne(protos, model_loss)
     '''
     distances = torch.norm(protos[1:] - protos[:-1], dim=1).tolist()
     print('======================')
