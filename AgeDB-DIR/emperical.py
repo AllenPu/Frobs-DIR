@@ -45,7 +45,7 @@ if __name__ == '__main__':
     #
     ckpt = torch.load(model_name)
     #
-    model.load_state_dict(ckpt)
+    model.load_state_dict(ckpt.state_dict)
     #
     print('model loaded')
     model.eval()
