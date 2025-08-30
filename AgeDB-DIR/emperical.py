@@ -4,7 +4,8 @@ from collections import OrderedDict
 from train import load_datasets, cal_prototype
 import argparse
 import os
-
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
 
 
 
@@ -31,6 +32,14 @@ def load_model():
     return model
 
 
+def draw_tsne(protos, model_name):
+    tsne = TSNE(n_components=2, random_state=0)
+    data_tsne = tsne.fit_transform(protos)
+    plt.figure(figsize=(10,10))
+    plt.scatter(data_tsne[:0], data_tsne[:1])
+    plt.title(f' T-SNE in loss {model_name}')
+    plt.savefig(f'./{model_name}.jpg')
+
 
 if __name__ == '__main__':
     print('start')
@@ -52,7 +61,10 @@ if __name__ == '__main__':
     model.eval()
     proto, labels = cal_prototype(model, test_loader)
     # [feature]
-    protos = torch.stack(proto, dim=0)
+    protos = torch.stack(proto, dim=0).tolist()
+    #
+    draw_tsne(protos, 'SuperCR')
+    '''
     distances = torch.norm(protos[1:] - protos[:-1], dim=1).tolist()
     print('======================')
     with open(f'dis_{model_loss}.txt', 'a') as f:
@@ -63,6 +75,7 @@ if __name__ == '__main__':
         for e in labels:
             f.write(str(e) + '\n')
         f.close()
+    '''
     
             
     
