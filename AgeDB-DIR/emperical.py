@@ -41,7 +41,9 @@ if __name__ == '__main__':
     #model = load_model().to(device)
     model = Regression(name='resnet18')
     #
-    ckpt = torch.load('./MSE.pth')
+    model_name = 'MSE' + '.pth'
+    #
+    ckpt = torch.load(model_name)
     #
     model.load_state_dict(ckpt)
     #
@@ -52,11 +54,11 @@ if __name__ == '__main__':
     protos = torch.stack(proto, dim=0)
     distances = torch.norm(protos[1:] - protos[:-1], dim=1).tolist()
     print('======================')
-    with open('dis.txt', 'a') as f:
+    with open(f'dis_{model_name}.txt', 'a') as f:
         for e in distances:
             f.write(str(e) + '\n')
         f.close()
-    with open('label.txt', 'a') as f:
+    with open(f'label_{model_name}.txt', 'a') as f:
         for e in labels:
             f.write(str(e) + '\n')
         f.close()
