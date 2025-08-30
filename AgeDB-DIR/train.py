@@ -83,7 +83,7 @@ def train_one_epoch(model, train_loader, opt):
         #loss_mse = torch.nn.functional.mse_loss(y, y_pred, reduction='none')
         loss_mse = torch.abs(y -  y_pred)
         # LDS
-        loss_mse = torch.mean(loss_mse * w.expand_as(loss_mse))
+        #loss_mse = torch.mean(loss_mse * w.expand_as(loss_mse))
         loss += loss_mse
         opt.zero_grad()
         loss.backward()
