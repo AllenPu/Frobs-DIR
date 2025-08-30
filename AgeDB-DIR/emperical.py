@@ -61,7 +61,7 @@ if __name__ == '__main__':
     print('data loaded')
     #model = load_model().to(device)
     #
-    model_loss = 'MAE'
+    model_loss = 'MSE'
     #
     model_name = model_loss + '.pth'
     #
