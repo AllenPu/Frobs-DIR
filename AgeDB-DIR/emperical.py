@@ -38,7 +38,13 @@ if __name__ == '__main__':
     print('load hyper-param')
     train_loader, val_loader, test_loader, train_lables = load_datasets(args)
     print('data loaded')
-    model = load_model().to(device)
+    #model = load_model().to(device)
+    model = Regression(name='resnet18')
+    #
+    ckpt = torch.load('./MSE.pth')
+    #
+    model.load_state_dict(ckpt)
+    #
     print('model loaded')
     model.eval()
     proto, labels = cal_prototype(model, test_loader)
