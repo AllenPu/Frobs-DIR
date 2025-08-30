@@ -45,10 +45,10 @@ def draw_tsne(protos, model_name):
     df["comp1"] = data_tsne[:, 0]
     df["comp2"] = data_tsne[:, 1]
 
-    ax = sns.scatterplot(x= df.comp1.tolist(), y= df.comp2.tolist(),hue=df.y, style = df.y,
+    sns.scatterplot(x= df.comp1.tolist(), y= df.comp2.tolist(),hue=df.y, style = df.y,
                     palette=sns.color_palette("Set2",class_num),
                     data=df).set(title="T-SNE projection")
-    ax.legend_.remove()
+    plt.legend().set_visible(False)
     plt.title(f' T-SNE in loss {model_name}')
     plt.savefig(f'./{model_name}.jpg')
 
