@@ -81,7 +81,7 @@ def train_one_epoch(model, train_loader, opt):
         x,y,w = x.to(device), y.to(device), w.to(device)
         y_pred, _ = model(x)
         #loss_mse = torch.nn.functional.mse_loss(y, y_pred, reduction='none')
-        loss_mse = torch.abs(y -  y_pred)
+        loss_mse = torch.mean(torch.abs(y -  y_pred))
         # LDS
         #loss_mse = torch.mean(loss_mse * w.expand_as(loss_mse))
         loss += loss_mse
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     #    model = warm_up_one_epoch(model, train_loader, opt)
     for e in tqdm(range(args.epoch)):
         model = train_one_epoch(model, train_loader, opt)
-    torch.save(model, './MAE.pth')
+    #torch.save(model, './MAE.pth')
 # this can be written for SDE-EDG
     #
     #
