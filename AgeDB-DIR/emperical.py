@@ -41,7 +41,7 @@ if __name__ == '__main__':
     #model = load_model().to(device)
     #model = Regression(name='resnet18')
     #
-    model_loss = 'MAE_LDS'
+    model_loss = 'MAE'
     #
     model_name = model_loss + '.pth'
     #
