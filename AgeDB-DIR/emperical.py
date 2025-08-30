@@ -36,7 +36,7 @@ def draw_tsne(protos, model_name):
     tsne = TSNE(n_components=2, random_state=0)
     data_tsne = tsne.fit_transform(protos)
     plt.figure(figsize=(10,10))
-    plt.scatter(data_tsne[:0], data_tsne[:1])
+    plt.scatter(data_tsne[:,0], data_tsne[:,1])
     plt.title(f' T-SNE in loss {model_name}')
     plt.savefig(f'./{model_name}.jpg')
 
