@@ -78,7 +78,7 @@ def train_one_epoch(model, train_loader, opt):
     model.train()
     for idx, (x,y, w) in enumerate(train_loader):
         loss = 0
-        x,y = x.to(device), y.to(device)
+        x,y,w = x.to(device), y.to(device), w.to(device)
         y_pred, _ = model(x)
         loss_mse = torch.nn.functional.mse_loss(y, y_pred, reduction = 'none')
         # LDS
