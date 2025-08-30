@@ -39,7 +39,7 @@ if __name__ == '__main__':
     train_loader, val_loader, test_loader, train_lables = load_datasets(args)
     print('data loaded')
     #model = load_model().to(device)
-    model = Regression(name='resnet18')
+    #model = Regression(name='resnet18')
     #
     model_name = 'MSE' + '.pth'
     #
