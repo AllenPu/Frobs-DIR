@@ -59,13 +59,13 @@ if __name__ == '__main__':
     print('load hyper-param')
     train_loader, val_loader, test_loader, train_lables = load_datasets(args)
     print('data loaded')
-    model = load_model().to(device)
+    #model = load_model().to(device)
     #
-    model_loss = 'SuperCR'
+    model_loss = 'MAE'
     #
-    #model_name = model_loss + '.pth'
+    model_name = model_loss + '.pth'
     #
-    #model = torch.load(model_name)
+    model = torch.load(model_name)
     #
     #model.load_state_dict(ckpt.state_dict)
     #
