@@ -80,7 +80,8 @@ def train_one_epoch(model, train_loader, opt):
         loss = 0
         x,y,w = x.to(device), y.to(device), w.to(device)
         y_pred, _ = model(x)
-        loss_mse = torch.nn.functional.L1Loss(y, y_pred, reduction = 'none')
+        #loss_mse = torch.nn.functional.mse_loss(y, y_pred, reduction='none')
+        loss_mse = torch.abs(y -  y_pred)
         # LDS
         loss_mse = torch.mean(loss_mse * w.expand_as(loss_mse))
         loss += loss_mse
