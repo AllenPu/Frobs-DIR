@@ -43,9 +43,9 @@ if __name__ == '__main__':
     #
     model_name = 'MSE' + '.pth'
     #
-    ckpt = torch.load(model_name)
+    model = torch.load(model_name)
     #
-    model.load_state_dict(ckpt.state_dict)
+    #model.load_state_dict(ckpt.state_dict)
     #
     print('model loaded')
     model.eval()
