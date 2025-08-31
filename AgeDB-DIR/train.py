@@ -73,7 +73,7 @@ def warm_up_one_epoch(model, train_loader, opt):
 
 def train_one_epoch(model, train_loader, opt):
     ##################################
-    #proto = cal_prototype(model, train_loader)
+    proto = cal_prototype(model, train_loader)
     ##################################
     model.train()
     for idx, (x,y, w) in enumerate(train_loader):
@@ -92,12 +92,13 @@ def train_one_epoch(model, train_loader, opt):
    
 
 ##################################
-# return the prototype of each label
+# return the prototype of each label for the whole datasets
 def cal_prototype(model, train_loader):
     model.eval()
     with torch.no_grad():
         label_feat, proto = {}, []
-        for idx, (x,y, _) in enumerate(train_loader):
+        for idx, batch in enumerate(train_loader):
+            x, y, _ = batch
             x,y = x.to(device), y.to(device)
             _, z_pred = model(x)
             for l in y.unique(sorted=True):
@@ -112,6 +113,9 @@ def cal_prototype(model, train_loader):
         proto = [torch.mean(p, 0) for p in proto]
         labels = [k for k in sorted_label_feat.keys()]
     return proto, labels
+
+
+    
 
 
 
