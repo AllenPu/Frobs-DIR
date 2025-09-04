@@ -123,38 +123,26 @@ def get_lds_kernel_window(kernel, ks, sigma):
 
 
 
-# calculate the frob norm of test on different shots (frobs norm and nuc norm)
-def cal_frob_norm(y, feat, majs, meds, mino, maj_shot, med_shot, min_shot, maj_shot_nuc, med_shot_nuc, min_shot_nuc, device):
-    bsz = y.shape[0]
-    maj_index, med_index, min_index = [], [], []
-    for i in range(bsz):
-        if y[i] in majs:
-            maj_index.append(i)
-        elif y[i] in meds:
-            med_index.append(i)
-        else:
-            min_index.append(i)
-    #
-    if len(maj_index) != 0:
-        majority = torch.index_select(feat, dim=0, index=torch.LongTensor(maj_index).to(device))
-        ma = torch.mean(torch.norm(majority, p='fro', dim=-1))
-        ma_nuc = torch.norm(majority, p='nuc')/majority.shape[0]
-        #maj_shot = math.sqrt(maj_shot**2 + ma)
-        maj_shot.update(ma.item(), majority.shape[0])
-        maj_shot_nuc.update(ma_nuc.item(), majority.shape[0])
-    if len(med_index) != 0:
-        median = torch.index_select(feat, dim=0, index=torch.LongTensor(med_index).to(device))
-        md = torch.mean(torch.norm(median, p='fro', dim=-1))
-        md_nuc = torch.norm(median, p='nuc')/median.shape[0]
-        #med_shot = math.sqrt(med_shot**2 + md)
-        med_shot.update(md.item(), median.shape[0])
-        med_shot_nuc.update(md_nuc.item(), median.shape[0])
-    if len(min_index) != 0:
-        minority = torch.index_select(feat, dim=0, index=torch.LongTensor(min_index).to(device))
-        mi = torch.mean(torch.norm(minority, p='fro', dim=-1))
-        mi_nuc = torch.norm(minority, p='nuc')/minority.shape[0]
-        #min_shot = math.sqrt(mi**2 + mi)
-        min_shot.update(mi.item(), minority.shape[0])
-        min_shot_nuc.update(mi_nuc.item(), minority.shape[0])
-    return maj_shot, med_shot, min_shot, maj_shot_nuc, med_shot_nuc, min_shot_nuc
+def per_label_frobenius_norm(features, labels):
+    """
+    features: Tensor of shape (N, D)
+    labels: Tensor of shape (N,)
+    Returns: dict {label: avg Frobenius norm}
+    """
+    features = features.view(features.size(0), -1)  # Ensure shape (N, D)
+    labels = labels.view(-1)  # Ensure shape (N,)
+
+    unique_labels = labels.unique()
+    frob_norms = {}
+
+    for label in unique_labels:
+        mask = labels == label
+        feats = features[mask]  # (n_c, D)
+        if feats.size(0) == 0:
+            continue
+        norms = torch.norm(feats, p='fro', dim=1)  # L2 norm per row
+        avg = norms.mean().item()
+        frob_norms[int(label.item())] = avg
+
+    return frob_norms
 
