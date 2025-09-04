@@ -144,5 +144,7 @@ def per_label_frobenius_norm(features, labels):
         avg = norms.mean().item()
         frob_norms[int(label.item())] = avg
 
-    return frob_norms
+    frob_norm = {key  : frob_norms[key] for key in sorted(frob_norms.keys())}
+
+    return frob_norm
 
