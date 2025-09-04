@@ -30,11 +30,17 @@ parser.add_argument('--data_dir', type=str, default='/home/rpu2/scratch/data/imb
 parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('--warm_up_epoch', type=int, default=30)
 parser.add_argument('--epoch', type=int, default=100)
+parser.add_argument('--resume', action='store_true', help='whether use the ptrtrained model')
+parser.add_argument('--model_name', type=str, default='./MSE.pth' )
 
 
 
 def build_model(args):
-    return Regression(name='resnet18')
+    if args.resume:
+        model = torch.load(args.model_name)
+    else:
+        model = Regression(name='resnet18')
+    return model
 
 
 
