@@ -81,3 +81,27 @@ class AgeDB(data.Dataset):
         scaling = len(weights) / np.sum(weights)
         weights = [scaling * x for x in weights]
         return weights
+    
+
+    def cal_shots(self):
+        if self.split == 'train':
+            df = self.df
+            train_labels = df['age']
+            train_class_count,  per_shot_count = [],  {}
+            many_shot, med_shot, few_shot = [], [], []
+            for l in np.unique(train_labels):
+                train_class_count.append(len(
+                    train_labels[train_labels == l]))
+            train_shot_dict = {}
+            for i in range(len(train_class_count)):
+                if train_class_count[i] > 100:
+                    many_shot.append(i)
+                #train_shot_dict[i] = 0
+                elif train_class_count[i] < 20:
+                    few_shot.append(i)
+                else:
+                    med_shot.append(i)
+                ##########################
+                
+            #
+            return many_shot, med_shot, few_shot
