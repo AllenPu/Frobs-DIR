@@ -50,6 +50,10 @@ def load_datasets(args):
     train_labels = df_train['age']
 
     train_dataset = AgeDB(data_dir=args.data_dir, df=df_train, img_size=224, split='train')
+    #
+    many_shot, med_shot, few_shot = train_dataset.cal_shots()
+    diff_shots = [many_shot, med_shot, few_shot]
+    #
     val_dataset = AgeDB(data_dir=args.data_dir, df=df_val, img_size=224, split='val')
     test_dataset = AgeDB(data_dir=args.data_dir, df=df_test, img_size=224, split='test')
 
@@ -62,7 +66,7 @@ def load_datasets(args):
     print(f"Training data size: {len(train_dataset)}")
     print(f"Validation data size: {len(val_dataset)}")
     print(f"Test data size: {len(test_dataset)}")
-    return train_loader, val_loader, test_loader, train_labels
+    return train_loader, val_loader, test_loader, train_labels, diff_shots
 
 
 def warm_up_one_epoch(model, train_loader, opt):
@@ -123,6 +127,17 @@ def cal_prototype(model, train_loader):
 
 
 #####################################
+def post_hoc_train_one_epoch(model, train_loader, maj_shot, opt):
+    # first calculate the prototypes
+    proto = cal_prototype(model, train_loader)
+    for idx, (x, y, _) in enumerate(train_loader):
+        x,y = x.to(device), y.to(device)
+        y_flat = y.view(-1)                                # (N,)
+        y_maj = torch.as_tensor(maj_shot, dtype=y_flat.dtype, device=y_flat.device)
+        mask = torch.isin(y_maj, y_flat)                       # (M,) boolean
+        idx = torch.nonzero(mask, as_tuple=False).flatten()  # positions in B
+    return idx
+
 
 
 
@@ -130,13 +145,16 @@ def cal_prototype(model, train_loader):
 if __name__ == '__main__':
     args = parser.parse_args()
     model = build_model(args).to(device)
-    train_loader, val_loader, test_laoder, train_labels = load_datasets(args)
+    train_loader, val_loader, test_laoder, train_labels, diff_shots = load_datasets(args)
+    many_shot, med_shot, few_shot = diff_shots
     opt = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     #for e in range(args.warm_up_epoch):
     #    model = warm_up_one_epoch(model, train_loader, opt)
     for e in tqdm(range(args.epoch)):
         model = train_one_epoch(model, train_loader, opt)
-    torch.save(model, './MAE.pth')
+    ###############################
+    
+    #torch.save(model, './MAE.pth')
 # this can be written for SDE-EDG
     #
     #
