@@ -122,6 +122,10 @@ def cal_prototype(model, train_loader):
         labels = [k for k in sorted_label_feat.keys()]
     return proto, labels
 
+# return the linear coifficient 
+
+
+
 
 
 #####################################
@@ -134,7 +138,7 @@ def post_hoc_train_one_epoch(model, train_loader, maj_shot, opt):
         # 
         y_pred, z_pred = model(x)
 
-    return idx
+    return 0
 
 
 

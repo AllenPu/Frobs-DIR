@@ -171,3 +171,14 @@ class Regression(nn.Module):
             feat = F.normalize(feat, dim=-1)
         pred = self.regressor(feat)
         return pred, feat
+    
+
+# y = ax + b , where x and y is 1-d
+class Linears(nn.Module):
+    def __init__(self):
+        super(Linears, self).__init__()
+        self.linear = nn.Linear(in_features=1, out_features=1, bias=True)
+
+    def forward(self, y):
+        f_hat = self.linear(y)
+        return f_hat
