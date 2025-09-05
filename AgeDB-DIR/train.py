@@ -99,28 +99,6 @@ def train_one_epoch(model, train_loader, opt):
     return model
    
 
-##################################
-# return the prototype of each label for the whole datasets
-def cal_prototype(model, train_loader):
-    model.eval()
-    with torch.no_grad():
-        label_feat, proto = {}, []
-        for idx, batch in enumerate(train_loader):
-            x, y, _ = batch
-            x,y = x.to(device), y.to(device)
-            _, z_pred = model(x)
-            for l in y.unique(sorted=True):
-                index = y==l
-                index = index.squeeze(-1)
-                rows = z_pred[index]
-                keys = int(l.item())
-                label_feat[keys] = label_feat.get(keys, []) + list(rows.unbind(0))
-                #print('shape ', label_feat[keys])
-        sorted_label_feat = {key: label_feat[key] for key in sorted(label_feat.keys())}
-        proto = [torch.stack(sorted_label_feat[e], dim=0) for e in sorted_label_feat.keys()]
-        proto = [torch.mean(p, 0) for p in proto]
-        labels = [k for k in sorted_label_feat.keys()]
-    return proto, labels
 
 # return the linear coifficient 
 
@@ -132,11 +110,20 @@ def cal_prototype(model, train_loader):
 def post_hoc_train_one_epoch(model, train_loader, maj_shot, opt):
     # first calculate the prototypes
     proto = cal_prototype(model, train_loader)
+    # first train the 1-d linear
+    # orgnaize the (F, Y) pairs
+    maj_pairs = []
+    #
     for idx, (x, y, _) in enumerate(train_loader):
         x,y = x.to(device), y.to(device)
         y_index, y_maj = match_A_in_B(y, maj_shot)
         # 
+        y_maj_uniq = torch.unique(y_maj)
+        #
         y_pred, z_pred = model(x)
+        #
+        sub_proto = {key: proto[key.item()] for key in y_maj_uniq}
+        
 
     return 0
 

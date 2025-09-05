@@ -7,6 +7,8 @@ from scipy.ndimage import gaussian_filter1d
 from scipy.signal.windows import triang
 
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 class AverageMeter(object):
     def __init__(self, name, fmt=':f'):
         self.name = name
@@ -171,3 +173,27 @@ def match_A_in_B(A: torch.Tensor, B: list):
     #idx_in_A = [torch.nonzero(a == v).flatten() for v in vals]
 
     return idx_in_a, vals
+
+
+##################################
+# return the prototype of each label for the whole datasets
+def cal_prototype(model, train_loader):
+    model.eval()
+    with torch.no_grad():
+        label_feat, proto = {}, []
+        for idx, batch in enumerate(train_loader):
+            x, y, _ = batch
+            x,y = x.to(device), y.to(device)
+            _, z_pred = model(x)
+            for l in y.unique(sorted=True):
+                index = y==l
+                index = index.squeeze(-1)
+                rows = z_pred[index]
+                keys = int(l.item())
+                label_feat[keys] = label_feat.get(keys, []) + list(rows.unbind(0))
+                #print('shape ', label_feat[keys])
+        sorted_label_feat = {key: label_feat[key] for key in sorted(label_feat.keys())}
+        proto = [torch.stack(sorted_label_feat[e], dim=0) for e in sorted_label_feat.keys()]
+        proto = [torch.mean(p, 0) for p in proto]
+        labels = [k for k in sorted_label_feat.keys()]
+    return proto, labels
