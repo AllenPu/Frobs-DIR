@@ -125,32 +125,6 @@ def get_lds_kernel_window(kernel, ks, sigma):
 
 
 
-def per_label_frobenius_norm(features, labels):
-    """
-    features: Tensor of shape (N, D)
-    labels: Tensor of shape (N,)
-    Returns: dict {label: avg Frobenius norm}
-    """
-    features = features.view(features.size(0), -1)  # Ensure shape (N, D)
-    labels = labels.view(-1)  # Ensure shape (N,)
-
-    unique_labels = labels.unique()
-    frob_norms = {}
-
-    for label in unique_labels:
-        mask = labels == label
-        feats = features[mask]  # (n_c, D)
-        if feats.size(0) == 0:
-            continue
-        norms = torch.norm(feats, p='fro', dim=1)  # L2 norm per row
-        avg = norms.mean().item()
-        frob_norms[int(label.item())] = avg
-
-    frob_norm = {key  : frob_norms[key] for key in sorted(frob_norms.keys())}
-
-    return frob_norm
-
-
 
 def match_A_in_B(A: torch.Tensor, B: list):
     """
@@ -197,3 +171,50 @@ def cal_prototype(model, train_loader):
         proto = [torch.mean(p, 0) for p in proto]
         labels = [k for k in sorted_label_feat.keys()]
     return proto, labels
+
+
+
+
+
+#####################################
+def per_label_frobenius_norm(features, labels):
+    """
+    features: Tensor of shape (N, D)
+    labels: Tensor of shape (N,)
+    Returns: dict {label: avg Frobenius norm}
+    """
+    features = features.view(features.size(0), -1)  # Ensure shape (N, D)
+    labels = labels.view(-1)  # Ensure shape (N,)
+
+    unique_labels = labels.unique()
+    frob_norms = {}
+
+    for label in unique_labels:
+        mask = labels == label
+        feats = features[mask]  # (n_c, D)
+        if feats.size(0) == 0:
+            continue
+        norms = torch.norm(feats, p='fro', dim=1)  # L2 norm per row
+        avg = norms.mean().item()
+        frob_norms[int(label.item())] = avg
+
+    frob_norm = {key  : frob_norms[key] for key in sorted(frob_norms.keys())}
+
+    return frob_norm
+
+
+
+#####################################
+def cal_per_label_Frob(model, train_loader):
+    model.eval()
+    feature, label = [], []
+    with torch.no_grad():
+        for idx, (x, y, _) in enumerate(train_loader):
+            x = x.to(device)
+            _, z_pred = model(x)
+            feature.append(z_pred.cpu())
+            label.append(y)
+        features = torch.cat(feature, dim=0)
+        labels = torch.cat(label)
+    frob_norm = per_label_frobenius_norm(features, labels)
+    return frob_norm

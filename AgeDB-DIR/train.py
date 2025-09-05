@@ -109,10 +109,11 @@ def train_one_epoch(model, train_loader, opt):
 #####################################
 def post_hoc_train_one_epoch(model, train_loader, maj_shot, opt):
     # first calculate the prototypes
-    proto = cal_prototype(model, train_loader)
+    #proto = cal_prototype(model, train_loader)
+    frob_norm = cal_per_label_Frob(model, train_loader)
     # first train the 1-d linear
     # orgnaize the (F, Y) pairs
-    maj_pairs = []
+    maj_pairs = [], maj_pair_index = []
     #
     for idx, (x, y, _) in enumerate(train_loader):
         x,y = x.to(device), y.to(device)
@@ -122,7 +123,8 @@ def post_hoc_train_one_epoch(model, train_loader, maj_shot, opt):
         #
         y_pred, z_pred = model(x)
         #
-        sub_proto = {key: proto[key.item()] for key in y_maj_uniq}
+        
+        sub_proto = [(key, frob_norm[key.item()]) for key in y_maj_uniq if key not in maj_pair_index]
         
 
     return 0
