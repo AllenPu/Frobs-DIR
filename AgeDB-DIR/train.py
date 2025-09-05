@@ -130,10 +130,10 @@ def post_hoc_train_one_epoch(model, train_loader, maj_shot, opt):
     proto = cal_prototype(model, train_loader)
     for idx, (x, y, _) in enumerate(train_loader):
         x,y = x.to(device), y.to(device)
-        y_flat = y.view(-1)                                # (N,)
-        y_maj = torch.as_tensor(maj_shot, dtype=y_flat.dtype, device=y_flat.device)
-        mask = torch.isin(y_maj, y_flat)                       # (M,) boolean
-        idx = torch.nonzero(mask, as_tuple=False).flatten()  # positions in B
+        y_index, y_maj = match_A_in_B(y, maj_shot)
+        # 
+        y_pred, z_pred = model(x)
+
     return idx
 
 

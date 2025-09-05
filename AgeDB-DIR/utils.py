@@ -170,4 +170,4 @@ def match_A_in_B(A: torch.Tensor, B: list):
     # For each matched value, the indices in A where it occurs (handles duplicates)
     #idx_in_A = [torch.nonzero(a == v).flatten() for v in vals]
 
-    return idx_in_a.unsqueeze(-1), vals.unsqueeze(-1)
+    return idx_in_a, vals
