@@ -123,8 +123,11 @@ def post_hoc_train_one_epoch(model, train_loader, maj_shot, opt):
         #
         y_pred, z_pred = model(x)
         #
-        
+        y_list = [e.item() for e in y]
+        maj_pair_index.extend(y_list)
+        maj_pair_index = set(maj_pair_index)
         sub_proto = [(key, frob_norm[key.item()]) for key in y_maj_uniq if key not in maj_pair_index]
+        maj_pair_index = [*maj_pair_index]
         
 
     return 0
