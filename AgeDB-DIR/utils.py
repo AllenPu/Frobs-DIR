@@ -156,7 +156,6 @@ def match_A_in_B(A: torch.Tensor, B: list):
     B: list of length M (numeric), M > N
 
     Returns:
-      idx_in_B : (K,) LongTensor        # indices j in B where B[j] ∈ A
       vals     : (K,) Tensor            # the matching values (also in A)
       idx_in_A : list[LongTensor]       # for each vals[k], all i with A[i]==vals[k]
     """
@@ -164,11 +163,11 @@ def match_A_in_B(A: torch.Tensor, B: list):
     b = torch.as_tensor(B, dtype=a.dtype, device=a.device)
 
     # Indices in B whose values appear in A
-    mask = torch.isin(b, a)                 # (M,)
-    idx_in_B = torch.nonzero(mask).flatten()  # (K,)
-    vals = b[idx_in_B]                      # values that are in both
+    mask = torch.isin(a, b)                 # (N,)
+    idx_in_a = torch.nonzero(mask).flatten()  # (K,)
+    vals = a[idx_in_a]                      # values that are in both
 
     # For each matched value, the indices in A where it occurs (handles duplicates)
-    idx_in_A = [torch.nonzero(a == v).flatten() for v in vals]
+    #idx_in_A = [torch.nonzero(a == v).flatten() for v in vals]
 
-    return idx_in_B, vals, idx_in_A
+    return idx_in_a.unsqueeze(-1), vals.unsqueeze(-1)
