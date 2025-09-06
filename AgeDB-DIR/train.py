@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 #from tensorboard_logger import Logger
 
 
@@ -107,28 +107,59 @@ def train_one_epoch(model, train_loader, opt):
 
 
 #####################################
-def post_hoc_train_one_epoch(model, train_loader, maj_shot, opt):
+def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, maj_shot, opt):
     # first calculate the prototypes
     #proto = cal_prototype(model, train_loader)
     frob_norm = cal_per_label_Frob(model, train_loader)
     # first train the 1-d linear
     # orgnaize the (F, Y) pairs
-    maj_pairs = [], maj_pair_index = []
+    maj_pairs_x, maj_pairs_y, leftover_x = [], [], []
+    # orgnaize the majority in pairs (label, frobs)
+    for label in np.unique(train_labels):
+        if label in maj_shot:
+            frobs = frob_norm[label]
+            maj_pairs_x.append(label)
+            maj_pairs_y.append(frobs)
+            #
+        else:
+            # leftover (label, frob_norm) expect majority
+            leftover_x.append(label)
     #
-    for idx, (x, y, _) in enumerate(train_loader):
-        x,y = x.to(device), y.to(device)
-        y_index, y_maj = match_A_in_B(y, maj_shot)
-        # 
-        y_maj_uniq = torch.unique(y_maj)
-        #
-        y_pred, z_pred = model(x)
-        #
-        y_list = [e.item() for e in y]
-        maj_pair_index.extend(y_list)
-        maj_pair_index = set(maj_pair_index)
-        sub_proto = [(key, frob_norm[key.item()]) for key in y_maj_uniq if key not in maj_pair_index]
-        maj_pair_index = [*maj_pair_index]
+    x = torch.Tensor(maj_pairs_x).float().unsqueeze(1) 
+    y = torch.Tensor(maj_pairs_y).float()
+    #
+    dataset = TensorDataset(x, y)
+    dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+    # to obtain the frobs prediction to regularize the few and median shot
+    leftover_x = torch.Tensor(leftover_x).float().unsqueeze(1) 
+    #
+    model_linear.train()
+    # train the linear to map (labels, frobs_norm)
+    for idx, (x, f) in enumerate(dataloader):
+        x, f = x.to(device), y.to(device)
+        f_pred = model_linear(x)
+        loss = nn.functional.mse_loss(f_pred, f)
+        opt_linear.zero_grad()
+        loss.backward()
+        opt_linear.step()
+    #
+    f_preds = []
+    model_linear.eval()
+    with torch.no_grad():
+        f_pred = model_linear(leftover_x.to(device))
+        f_preds.append(f_pred.cpu().view(-1).tolist())
+    #
+    leftover_y = torch.Tensor(f_preds).unsqueeze(-1)
+    leftover_dataset = TensorDataset(leftover_x, leftover_y)
+    leftover_dataloader = DataLoader(leftover_dataset, batch_size=4, shuffle=True)
+    #
+    # we can fine tune the regression model noew
+    #
+
         
+    
+
+
 
     return 0
 
@@ -137,15 +168,21 @@ def post_hoc_train_one_epoch(model, train_loader, maj_shot, opt):
 
 
 if __name__ == '__main__':
+    #
     args = parser.parse_args()
-    model = build_model(args).to(device)
+    #
+    model_regression = build_model(args).to(device)
+    model_linear = Linears().to(device)
+    #
     train_loader, val_loader, test_laoder, train_labels, diff_shots = load_datasets(args)
     many_shot, med_shot, few_shot = diff_shots
-    opt = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    #
+    opt = optim.Adam(model_regression.parameters(), lr=1e-3, weight_decay=1e-4)
+    opt_linear = opt.Adam(model_linear.parameters(), lr=1e-3, weight_decay=1e-4)
     #for e in range(args.warm_up_epoch):
     #    model = warm_up_one_epoch(model, train_loader, opt)
     for e in tqdm(range(args.epoch)):
-        model = train_one_epoch(model, train_loader, opt)
+        model_regression = train_one_epoch(model_regression, train_loader, opt)
     ###############################
     
     #torch.save(model, './MAE.pth')
