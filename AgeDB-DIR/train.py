@@ -107,7 +107,7 @@ def train_one_epoch(model, train_loader, opt):
 
 
 #####################################
-def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, val_laoder, maj_shot, opt):
+def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, val_loader, maj_shot):
     # first calculate the prototypes
     #proto = cal_prototype(model, train_loader)
     frob_norm = cal_per_label_Frob(model_regression, train_loader)
@@ -153,19 +153,37 @@ def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, val_l
     #
     with torch.no_grad():
         # the x here is the label
-        f_pred = model_linear(leftover_l.to(device))
-        leftover_f = f_pred.cpu().view(-1).tolist()
-    #
+        leftover_f  = model_linear(leftover_l.to(device))
+        #leftover_f = f_pred.cpu().view(-1).tolist()
     #
     # we treat the predicted value over the linear as the ground truth of the minority and median
     # therefore we construct the {label , frobs_pred} pairs given the predicted frobs on the few and med
     #
-    for l, f in zip(leftover_l.view(-1).tolist(), leftover_f):
-        frob_norm_pred[l] = f
+    for l, f in zip(leftover_l, leftover_f):
+        frob_norm_pred[l.item()] = f.item()
     #
+    model_regression.train()
+    for idx, (x, y, _) in enumerate(val_loader):
+        frob_loss = 0
+        x, y = x.to(device), y.to(device)
+        y_pred, z_pred = model_regression(x)
+        z_pred_f_norm = torch.norm(z_pred, p='fro', dim=1)
+        for y_ in torch.unqiue(y):
+            idxs = (y == y_).nonzero(as_tuple=True)[0].unsqueeze(-1)
+            pred_frob = torch.mean(z_pred_f_norm[idxs].float())
+            gt_frob = frob_norm_pred[y_]
+            frob_loss += nn.functional.mse_loss(pred_frob, gt_frob)
+        mse_loss = nn.functional.mse_loss(y_pred, y)
+        loss = mse_loss + frob_loss
+        #
+        opt_regression.zero_grad()
+        loss.backward()
+        opt_regression.step()
+    #
+    return model_regression, model_linear
     '''
     leftover_l = torch.Tensor(leftover_l).float().unsqueeze(1) 
-    leftover_f = torch.Tensor(f_norm).unsqueeze(-1)
+    leftover_f = torch.Tensor(leftover_f).unsqueeze(-1)
     leftover_dataset = TensorDataset(leftover_l, leftover_f)
     # we concat the leftover (minority and median shots) with majority to formulate the new dataset
     sft_dataset = ConcatDataset([linear_dataset, leftover_dataset])
@@ -175,17 +193,6 @@ def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, val_l
     # we can fine tune the regression model noew
     #
     '''
-    
-        
-
-        
-
-        
-    
-
-
-
-    return 0
 
 
 
@@ -199,18 +206,22 @@ if __name__ == '__main__':
     model_linear = Linears().to(device)
     #
     train_loader, val_loader, test_laoder, train_labels, diff_shots = load_datasets(args)
-    many_shot, med_shot, few_shot = diff_shots
+    maj_shot, med_shot, few_shot = diff_shots
     #
-    opt = optim.Adam(model_regression.parameters(), lr=1e-3, weight_decay=1e-4)
-    opt_linear = opt.Adam(model_linear.parameters(), lr=1e-3, weight_decay=1e-4)
+    opt_regression = optim.Adam(model_regression.parameters(), lr=1e-3, weight_decay=1e-4)
+    opt_linear = optim.Adam(model_linear.parameters(), lr=1e-3, weight_decay=1e-4)
     #for e in range(args.warm_up_epoch):
     #    model = warm_up_one_epoch(model, train_loader, opt)
     for e in tqdm(range(args.epoch)):
-        model_regression = train_one_epoch(model_regression, train_loader, opt)
+        model_regression = train_one_epoch(model_regression, train_loader)
     ###############################
+    model_regression, model_linear = post_hoc_train_one_epoch(model_regression, model_linear, train_loader, val_loader, maj_shot)
+
+
+
     
     #torch.save(model, './MAE.pth')
-# this can be written for SDE-EDG
+    # this can be written for SDE-EDG
     #
     #
     # to do : calcualte the distance between the majority and minority
