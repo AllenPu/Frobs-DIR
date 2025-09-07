@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 #from tensorboard_logger import Logger
 
 
@@ -127,15 +127,15 @@ def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, maj_s
     #
     x = torch.Tensor(maj_pairs_x).float().unsqueeze(1) 
     y = torch.Tensor(maj_pairs_y).float()
-    #
-    dataset = TensorDataset(x, y)
-    dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+    # dataset to train linear with only majority shot (label, frobs)
+    linear_dataset = TensorDataset(x, y)
+    linear_dataloader = DataLoader(linear_dataset, batch_size=4, shuffle=True)
     # to obtain the frobs prediction to regularize the few and median shot
     leftover_x = torch.Tensor(leftover_x).float().unsqueeze(1) 
     #
     model_linear.train()
     # train the linear to map (labels, frobs_norm)
-    for idx, (x, f) in enumerate(dataloader):
+    for idx, (x, f) in enumerate(linear_dataloader):
         x, f = x.to(device), y.to(device)
         f_pred = model_linear(x)
         loss = nn.functional.mse_loss(f_pred, f)
@@ -151,7 +151,9 @@ def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, maj_s
     # we treat the predicted value over the linear as the ground truth of the minority and median
     leftover_y = torch.Tensor(f_preds).unsqueeze(-1)
     leftover_dataset = TensorDataset(leftover_x, leftover_y)
-    leftover_dataloader = DataLoader(leftover_dataset, batch_size=4, shuffle=True)
+    # we concat the leftover (minority and median shots) with majority to formulate the new dataset
+    sft_dataset = ConcatDataset([linear_dataset, leftover_dataset])
+    sft_dataloader = DataLoader(sft_dataset, batch_size=4, shuffle=True)
     #
     # we can fine tune the regression model noew
     #
