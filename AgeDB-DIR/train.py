@@ -13,7 +13,7 @@ import torch.optim as optim
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 #from tensorboard_logger import Logger
-
+from test import test
 
 from resnet import *
 from utils import *
@@ -216,10 +216,9 @@ if __name__ == '__main__':
         model_regression = train_one_epoch(model_regression, train_loader)
     ###############################
     model_regression, model_linear = post_hoc_train_one_epoch(model_regression, model_linear, train_loader, val_loader, maj_shot)
-
-
-
     
+
+
     #torch.save(model, './MAE.pth')
     # this can be written for SDE-EDG
     #

@@ -31,7 +31,7 @@ class AverageMeter(object):
     
 
 
-def shot_metric(pred, labels, train_labels, many_shot_thr=100, low_shot_thr=20):
+def shot_metrics(pred, labels, train_labels, many_shot_thr=100, low_shot_thr=20):
     # input of the pred & labels are all numpy.darray
     # train_labels is from csv , e.g. df['age']
     #
@@ -95,61 +95,43 @@ def shot_metric(pred, labels, train_labels, many_shot_thr=100, low_shot_thr=20):
 
 
 def test(model, test_loader, train_labels, args):
-    model.eval()
     #
-    mse_pred = AverageMeter()
-    acc_mae_gt = AverageMeter()
-    acc_mae_pred = AverageMeter()
-    # gmean
-    criterion_gmean_gt = nn.L1Loss(reduction='none')
-    criterion_gmean_pred = nn.L1Loss(reduction='none')
-    gmean_loss_all_gt, gmean_loss_all_pred = [], [] 
-    #
-    pred_gt, pred, labels, = [], [], []
-    #
-    with torch.no_grad():
-        for idx, (x, y, g) in enumerate(test_loader):
-            bsz = x.shape[0]
-            x, y, g = x.to(device), y.to(device), g.to(device)
-        #
-            labels.extend(y.data.cpu().numpy())
-            y_output, _ = model(x)
-            #
-            #print(f' y shape is  {y_output.shape}')
-            #
-            y_chunk = torch.chunk(y_output, 2, dim=1)
-            g_hat, y_pred = y_chunk[0], y_chunk[1]
-            #
-            g_index = torch.argmax(g_hat, dim=1).unsqueeze(-1)
-            # newly added
-            #
-            y_hat = torch.gather(y_pred, dim=1, index=g_index)
-            y_pred_gt = torch.gather(y_pred, dim=1, index=g.to(torch.int64))
-            #
-            mae_y = torch.mean(torch.abs(y_hat - y))
-            mae_y_gt = torch.mean(torch.abs(y_pred_gt - y))
-            mse_y_pred = F.mse_loss(y_hat, y)
-            #
-            pred.extend(y_hat.data.cpu().numpy())
-            pred_gt.extend(y_pred_gt.data.cpu().numpy())
-            #
-            # gmean
-            loss_all_gt = criterion_gmean_gt(y_pred_gt, y)
-            loss_all_pred = criterion_gmean_pred(y_hat, y)
-            gmean_loss_all_gt.extend(loss_all_gt.cpu().numpy())
-            gmean_loss_all_pred.extend(loss_all_pred.cpu().numpy())
-            #
-            mse_pred.update(mse_y_pred.item(), bsz)
-            #
-            acc_mae_gt.update(mae_y_gt.item(), bsz)
-            acc_mae_pred.update(mae_y.item(), bsz)
-        #
-        # gmean
-        gmean_gt = gmean(np.hstack(gmean_loss_all_gt), axis=None).astype(float)
-        gmean_pred = gmean(np.hstack(gmean_loss_all_pred), axis=None).astype(float)
-        shot_pred = shot_metric(pred, labels, train_labels)
-        shot_pred_gt = shot_metric(pred_gt, labels, train_labels)
-    print(f' MSE is {mse_pred.avg}')
+    losses_mse = AverageMeter('Loss (MSE)', ':.3f')
+    losses_l1 = AverageMeter('Loss (L1)', ':.3f')
 
-    return acc_mae_gt.avg, acc_mae_pred.avg, shot_pred, shot_pred_gt, gmean_gt, gmean_pred
-        # np.hstack(group), np.h
+
+    criterion_mse = nn.MSELoss()
+    criterion_l1 = nn.L1Loss()
+    criterion_gmean = nn.L1Loss(reduction='none')
+
+    model.eval()
+    losses_all = []
+    preds, labels = [], []
+    with torch.no_grad():
+        #
+        for idx, (inputs, targets, _) in enumerate(test_loader):
+            inputs, targets = inputs.cuda(non_blocking=True), targets.cuda(non_blocking=True)
+            outputs = model(inputs)
+
+            preds.extend(outputs.data.cpu().numpy())
+            labels.extend(targets.data.cpu().numpy())
+
+            loss_mse = criterion_mse(outputs, targets)
+            loss_l1 = criterion_l1(outputs, targets)
+            loss_all = criterion_gmean(outputs, targets)
+            losses_all.extend(loss_all.cpu().numpy())
+
+            losses_mse.update(loss_mse.item(), inputs.size(0))
+            losses_l1.update(loss_l1.item(), inputs.size(0))
+
+        shot_dict = shot_metrics(np.hstack(preds), np.hstack(labels), train_labels)
+        loss_gmean = gmean(np.hstack(losses_all), axis=None).astype(float)
+        print(f" * Overall: MSE {losses_mse.avg:.3f}\tL1 {losses_l1.avg:.3f}\tG-Mean {loss_gmean:.3f}")
+        print(f" * Many: MSE {shot_dict['many']['mse']:.3f}\t"
+              f"L1 {shot_dict['many']['l1']:.3f}\tG-Mean {shot_dict['many']['gmean']:.3f}")
+        print(f" * Median: MSE {shot_dict['median']['mse']:.3f}\t"
+              f"L1 {shot_dict['median']['l1']:.3f}\tG-Mean {shot_dict['median']['gmean']:.3f}")
+        print(f" * Low: MSE {shot_dict['low']['mse']:.3f}\t"
+              f"L1 {shot_dict['low']['l1']:.3f}\tG-Mean {shot_dict['low']['gmean']:.3f}")
+
+    return losses_mse.avg, losses_l1.avg, loss_gmean
