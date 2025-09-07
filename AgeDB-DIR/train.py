@@ -148,7 +148,7 @@ def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, maj_s
     with torch.no_grad():
         f_pred = model_linear(leftover_x.to(device))
         f_preds.append(f_pred.cpu().view(-1).tolist())
-    #
+    # we treat the predicted value over the linear as the ground truth of the minority and median
     leftover_y = torch.Tensor(f_preds).unsqueeze(-1)
     leftover_dataset = TensorDataset(leftover_x, leftover_y)
     leftover_dataloader = DataLoader(leftover_dataset, batch_size=4, shuffle=True)
