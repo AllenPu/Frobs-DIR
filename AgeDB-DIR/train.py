@@ -110,53 +110,69 @@ def train_one_epoch(model, train_loader, opt):
 def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, maj_shot, opt):
     # first calculate the prototypes
     #proto = cal_prototype(model, train_loader)
-    frob_norm = cal_per_label_Frob(model, train_loader)
+    frob_norm = cal_per_label_Frob(model_regression, train_loader)
     # first train the 1-d linear
     # orgnaize the (F, Y) pairs
-    maj_pairs_x, maj_pairs_y, leftover_x = [], [], []
+    # this dictionary is constructed by (majority, its true frobs) + (med/few, its pred frobs)
+    frob_norm_pred = {}
+    maj_pairs_l, maj_pairs_f, leftover_l = [], [], []
     # orgnaize the majority in pairs (label, frobs)
     for label in np.unique(train_labels):
         if label in maj_shot:
             frobs = frob_norm[label]
-            maj_pairs_x.append(label)
-            maj_pairs_y.append(frobs)
+            maj_pairs_l.append(label)
+            maj_pairs_f.append(frobs)
             #
         else:
             # leftover (label, frob_norm) expect majority
-            leftover_x.append(label)
+            leftover_l.append(label)
+    # fill the dictionary
+    for l, f in zip(maj_pairs_l, maj_pairs_f):
+        frob_norm_pred[l] = f
     #
-    x = torch.Tensor(maj_pairs_x).float().unsqueeze(1) 
-    y = torch.Tensor(maj_pairs_y).float()
+    l_data = torch.Tensor(maj_pairs_l).float().unsqueeze(1) 
+    f_data = torch.Tensor(maj_pairs_f).float()
     # dataset to train linear with only majority shot (label, frobs)
-    linear_dataset = TensorDataset(x, y)
+    linear_dataset = TensorDataset(l_data, f_data)
     linear_dataloader = DataLoader(linear_dataset, batch_size=4, shuffle=True)
     # to obtain the frobs prediction to regularize the few and median shot
-    leftover_x = torch.Tensor(leftover_x).float().unsqueeze(1) 
     #
     model_linear.train()
     # train the linear to map (labels, frobs_norm)
-    for idx, (x, f) in enumerate(linear_dataloader):
-        x, f = x.to(device), y.to(device)
-        f_pred = model_linear(x)
+    for idx, (l,  f) in enumerate(linear_dataloader):
+        l, f = l.to(device), f.to(device)
+        f_pred = model_linear(l)
         loss = nn.functional.mse_loss(f_pred, f)
         opt_linear.zero_grad()
         loss.backward()
         opt_linear.step()
     #
-    f_preds = []
     model_linear.eval()
     with torch.no_grad():
-        f_pred = model_linear(leftover_x.to(device))
-        f_preds.append(f_pred.cpu().view(-1).tolist())
+        # the x here is the label
+        f_pred = model_linear(leftover_l.to(device))
+        f_norm = f_pred.cpu().view(-1).tolist()
+    #
     # we treat the predicted value over the linear as the ground truth of the minority and median
-    leftover_y = torch.Tensor(f_preds).unsqueeze(-1)
-    leftover_dataset = TensorDataset(leftover_x, leftover_y)
+    # therefore we construct the {label , frobs_pred} pairs given the predicted frobs on the few and med
+    #
+    for l, f in zip(leftover_l, leftover_f):
+        frob_norm_pred[l] = f
+    #
+    leftover_l = torch.Tensor(leftover_l).float().unsqueeze(1) 
+    leftover_f = torch.Tensor(f_norm).unsqueeze(-1)
+    leftover_dataset = TensorDataset(leftover_l, leftover_f)
     # we concat the leftover (minority and median shots) with majority to formulate the new dataset
     sft_dataset = ConcatDataset([linear_dataset, leftover_dataset])
     sft_dataloader = DataLoader(sft_dataset, batch_size=4, shuffle=True)
+    # the  x  here is the label and the y here  is the frobs norm
     #
     # we can fine tune the regression model noew
     #
+    
+        
+
+        
 
         
     
