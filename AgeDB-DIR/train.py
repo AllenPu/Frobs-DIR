@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 from test import test
 
 from resnet import *
-from utils import *
+from utils import cal_per_label_Frob
 from agedb import *
 
 import os
