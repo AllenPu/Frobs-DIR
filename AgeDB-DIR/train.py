@@ -205,7 +205,7 @@ if __name__ == '__main__':
     model_regression = build_model(args).to(device)
     model_linear = Linears().to(device)
     #
-    train_loader, val_loader, test_laoder, train_labels, diff_shots = load_datasets(args)
+    train_loader, val_loader, test_loadder, train_labels, diff_shots = load_datasets(args)
     maj_shot, med_shot, few_shot = diff_shots
     #
     opt_regression = optim.Adam(model_regression.parameters(), lr=1e-3, weight_decay=1e-4)
@@ -216,7 +216,8 @@ if __name__ == '__main__':
         model_regression = train_one_epoch(model_regression, train_loader)
     ###############################
     model_regression, model_linear = post_hoc_train_one_epoch(model_regression, model_linear, train_loader, val_loader, maj_shot)
-    
+    # test
+    mse_avg, l1_avg, loss_gmean = test(model_regression,test_loadder, train_labels, args)
 
 
     #torch.save(model, './MAE.pth')
