@@ -107,7 +107,7 @@ def train_one_epoch(model, train_loader, opt):
 
 
 #####################################
-def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, maj_shot, opt):
+def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, val_laoder, maj_shot, opt):
     # first calculate the prototypes
     #proto = cal_prototype(model, train_loader)
     frob_norm = cal_per_label_Frob(model_regression, train_loader)
@@ -148,17 +148,22 @@ def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, maj_s
         opt_linear.step()
     #
     model_linear.eval()
+    #
+    leftover_l = torch.Tensor(leftover_l).float().unsqueeze(1) 
+    #
     with torch.no_grad():
         # the x here is the label
         f_pred = model_linear(leftover_l.to(device))
-        f_norm = f_pred.cpu().view(-1).tolist()
+        leftover_f = f_pred.cpu().view(-1).tolist()
+    #
     #
     # we treat the predicted value over the linear as the ground truth of the minority and median
     # therefore we construct the {label , frobs_pred} pairs given the predicted frobs on the few and med
     #
-    for l, f in zip(leftover_l, leftover_f):
+    for l, f in zip(leftover_l.view(-1).tolist(), leftover_f):
         frob_norm_pred[l] = f
     #
+    '''
     leftover_l = torch.Tensor(leftover_l).float().unsqueeze(1) 
     leftover_f = torch.Tensor(f_norm).unsqueeze(-1)
     leftover_dataset = TensorDataset(leftover_l, leftover_f)
@@ -169,6 +174,7 @@ def post_hoc_train_one_epoch(model_regression, model_linear, train_loader, maj_s
     #
     # we can fine tune the regression model noew
     #
+    '''
     
         
 
