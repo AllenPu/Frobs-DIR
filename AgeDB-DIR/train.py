@@ -212,11 +212,15 @@ if __name__ == '__main__':
     opt_linear = optim.Adam(model_linear.parameters(), lr=1e-3, weight_decay=1e-4)
     #for e in range(args.warm_up_epoch):
     #    model = warm_up_one_epoch(model, train_loader, opt)
-    for e in tqdm(range(args.epoch)):
-        model_regression = train_one_epoch(model_regression, train_loader)
+    if not args.resume:
+        for e in tqdm(range(args.epoch)):
+            model_regression = train_one_epoch(model_regression, train_loader)
+    print('==================Before SFT===================')
+    mse_avg, l1_avg, loss_gmean = test(model_regression,test_loadder, train_labels, args)
     ###############################
     model_regression, model_linear = post_hoc_train_one_epoch(model_regression, model_linear, train_loader, val_loader, maj_shot)
     # test
+    print('===================After SFT======================')
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loadder, train_labels, args)
 
 
