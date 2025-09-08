@@ -136,7 +136,7 @@ if __name__ == '__main__':
     opts = [opt_regression, opt_linear]
     loaders = [train_loader, val_loader]
     ###############################
-    model_regression, model_linear = post_hoc_train_one_epoch(models, loaders, opts, maj_shot)
+    model_regression, model_linear = post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot)
     # test
     print('===================After SFT======================')
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loadder, train_labels, args)
