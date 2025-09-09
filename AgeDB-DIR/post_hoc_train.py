@@ -47,6 +47,7 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot):
     for idx, (l,  f) in enumerate(linear_dataloader):
         l, f = l.to(device), f.to(device)
         f_pred = model_linear(l)
+        print(f' shape of f {f.shape} shape of f_pred {f_pred.shape}')
         loss = nn.functional.mse_loss(f_pred, f)
         opt_linear.zero_grad()
         loss.backward()
@@ -77,7 +78,7 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot):
             idxs = (y == y_).nonzero(as_tuple=True)[0].unsqueeze(-1)
             pred_frob = torch.mean(z_pred_f_norm[idxs].float())
             gt_frob = frob_norm_pred[y_.item()]
-            frob_loss += nn.functional.mse_loss(pred_frob, gt_frob)
+            frob_loss += nn.functional.mse_loss(pred_frob, torch.Tensor(gt_frob))
         mse_loss = nn.functional.mse_loss(y_pred, y)
         loss = mse_loss + frob_loss
         #
