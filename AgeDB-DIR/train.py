@@ -33,6 +33,7 @@ parser.add_argument('--warm_up_epoch', type=int, default=30)
 parser.add_argument('--epoch', type=int, default=100)
 parser.add_argument('--resume', action='store_true', help='whether use the ptrtrained model')
 parser.add_argument('--model_name', type=str, default='./MSE.pth' )
+parser.add_argument('--sft_epoch', type=int, default=1, help='how much epoch used to fine tune the pre-trained model')
 
 
 
