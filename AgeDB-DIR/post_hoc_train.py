@@ -4,15 +4,17 @@ import torch.nn.functional as F
 from utils import cal_per_label_Frob
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
+from tqdm import tqdm
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 #####################################
-def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot, linear_epoch=10):
+def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot, epochs):
     #
     model_regression, model_linear = models
     train_loader, val_loader = loaders
     opt_regression, opt_linear = opts
+    regression_epoch, linear_epoch = epochs
     # first calculate the prototypes
     #proto = cal_prototype(model, train_loader)
     frob_norm = cal_per_label_Frob(model_regression, train_loader)
@@ -43,7 +45,7 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot, line
     # to obtain the frobs prediction to regularize the few and median shot
     #
     model_linear.train()
-    for e in range(linear_epoch):
+    for e in tqdm(range(linear_epoch)):
     # train the linear to map (labels, frobs_norm)
         for idx, (l,  f) in enumerate(linear_dataloader):
             l, f = l.to(device), f.to(device)
@@ -70,22 +72,23 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot, line
         frob_norm_pred[l.item()] = f.item()
     #
     model_regression.train()
-    for idx, (x, y, _) in enumerate(val_loader):
-        frob_loss = 0
-        x, y = x.to(device), y.to(device)
-        y_pred, z_pred = model_regression(x)
-        z_pred_f_norm = torch.norm(z_pred, p='fro', dim=1)
-        for y_ in torch.unique(y):
-            idxs = (y == y_).nonzero(as_tuple=True)[0].unsqueeze(-1)
-            pred_frob = torch.mean(z_pred_f_norm[idxs].float())
-            gt_frob = torch.tensor(frob_norm_pred[y_.item()]).to(device)
-            frob_loss += nn.functional.mse_loss(pred_frob, gt_frob)
-        mse_loss = nn.functional.mse_loss(y_pred, y)
-        loss = mse_loss + frob_loss
-        #
-        opt_regression.zero_grad()
-        loss.backward()
-        opt_regression.step()
+    for e in range(regression_epoch):
+        for idx, (x, y, _) in enumerate(val_loader):
+            frob_loss = 0
+            x, y = x.to(device), y.to(device)
+            y_pred, z_pred = model_regression(x)
+            z_pred_f_norm = torch.norm(z_pred, p='fro', dim=1)
+            for y_ in torch.unique(y):
+                idxs = (y == y_).nonzero(as_tuple=True)[0].unsqueeze(-1)
+                pred_frob = torch.mean(z_pred_f_norm[idxs].float())
+                gt_frob = torch.tensor(frob_norm_pred[y_.item()]).to(device)
+                frob_loss += nn.functional.mse_loss(pred_frob, gt_frob)
+            mse_loss = nn.functional.mse_loss(y_pred, y)
+            loss = mse_loss + frob_loss
+            #
+            opt_regression.zero_grad()
+            loss.backward()
+            opt_regression.step()
     #
     return model_regression, model_linear
     '''
