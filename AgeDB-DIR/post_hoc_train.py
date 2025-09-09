@@ -49,7 +49,7 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot, line
             l, f = l.to(device), f.to(device)
             f_pred = model_linear(l)
         #print(f' shape of f {f.shape} shape of f_pred {f_pred.shape}')
-            loss = nn.functional.mse_loss(f_pred, f)
+            loss = nn.functional.mse_loss(f_pred, f.unsqueeze(-1))
             opt_linear.zero_grad()
             loss.backward()
             opt_linear.step()
