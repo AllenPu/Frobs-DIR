@@ -73,7 +73,7 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot):
         x, y = x.to(device), y.to(device)
         y_pred, z_pred = model_regression(x)
         z_pred_f_norm = torch.norm(z_pred, p='fro', dim=1)
-        for y_ in torch.unqiue(y):
+        for y_ in torch.unique(y):
             idxs = (y == y_).nonzero(as_tuple=True)[0].unsqueeze(-1)
             pred_frob = torch.mean(z_pred_f_norm[idxs].float())
             gt_frob = frob_norm_pred[y_]
