@@ -78,7 +78,7 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot):
             idxs = (y == y_).nonzero(as_tuple=True)[0].unsqueeze(-1)
             pred_frob = torch.mean(z_pred_f_norm[idxs].float())
             gt_frob = frob_norm_pred[y_.item()]
-            print(f'gt frb {gt_frob}')
+            print(f'pred frob {pred_frob} gt forb {gt_frob}')
             frob_loss += nn.functional.mse_loss(pred_frob, torch.Tensor(gt_frob))
         mse_loss = nn.functional.mse_loss(y_pred, y)
         loss = mse_loss + frob_loss
