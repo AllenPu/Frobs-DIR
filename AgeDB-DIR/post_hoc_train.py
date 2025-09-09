@@ -76,11 +76,12 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot):
         z_pred_f_norm = torch.norm(z_pred, p='fro', dim=1)
         for y_ in torch.unique(y):
             idxs = (y == y_).nonzero(as_tuple=True)[0].unsqueeze(-1)
-            print(f'f pred is {z_pred_f_norm[idxs]} idxs {idxs} y {y} y_ {y_}')
+            #print(f'f pred is {z_pred_f_norm[idxs]} idxs {idxs} y {y} y_ {y_}')
             pred_frob = torch.mean(z_pred_f_norm[idxs].float())
+            print('====', pred_frob)
             gt_frob = frob_norm_pred[y_.item()]
-            print(f'pred frob {pred_frob} gt forb {gt_frob}')
-            frob_loss += nn.functional.mse_loss(pred_frob, torch.Tensor(gt_frob))
+            #print(f'pred frob {pred_frob} gt forb {gt_frob}')
+            frob_loss += nn.functional.mse_loss(pred_frob, gt_frob)
         mse_loss = nn.functional.mse_loss(y_pred, y)
         loss = mse_loss + frob_loss
         #
