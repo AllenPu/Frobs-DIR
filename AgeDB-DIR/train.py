@@ -137,7 +137,7 @@ if __name__ == '__main__':
     opts = [opt_regression, opt_linear]
     loaders = [train_loader, val_loader]
     #
-    regression_peoch=10, linear_epoch=10
+    regression_peoch, linear_epoch = 10, 10
     epochs = [regression_peoch, linear_epoch]
     ###############################
     for e in range(args.sft_epoch):
