@@ -180,5 +180,5 @@ class Linears(nn.Module):
         self.linear = nn.Linear(in_features=1, out_features=1, bias=True)
 
     def forward(self, y):
-        f_hat = self.linear(y)
+        f_hat = torch.nn.functional.softplus(self.linear(y))
         return f_hat
