@@ -14,9 +14,9 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot, epoc
     #
     model_regression, model_linear = models
     train_loader, val_loader = loaders
-    _, opt_linear = opts
+    opt_regression, opt_linear = opts
     #
-    opt_regression = optim.Adam(model_regression.parameters(), lr=5e-5, weight_decay=1e-5)
+    #opt_regression = optim.Adam(model_regression.parameters(), lr=5e-5, weight_decay=1e-5)
     #
     regression_epoch, linear_epoch = epochs
     # first calculate the prototypes
