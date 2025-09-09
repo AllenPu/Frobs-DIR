@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, TensorDataset
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 #####################################
-def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot):
+def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot, linear_epoch=10):
     #
     model_regression, model_linear = models
     train_loader, val_loader = loaders
@@ -43,15 +43,16 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot):
     # to obtain the frobs prediction to regularize the few and median shot
     #
     model_linear.train()
+    for e in range(linear_epoch):
     # train the linear to map (labels, frobs_norm)
-    for idx, (l,  f) in enumerate(linear_dataloader):
-        l, f = l.to(device), f.to(device)
-        f_pred = model_linear(l)
-        print(f' shape of f {f.shape} shape of f_pred {f_pred.shape}')
-        loss = nn.functional.mse_loss(f_pred, f)
-        opt_linear.zero_grad()
-        loss.backward()
-        opt_linear.step()
+        for idx, (l,  f) in enumerate(linear_dataloader):
+            l, f = l.to(device), f.to(device)
+            f_pred = model_linear(l)
+        #print(f' shape of f {f.shape} shape of f_pred {f_pred.shape}')
+            loss = nn.functional.mse_loss(f_pred, f)
+            opt_linear.zero_grad()
+            loss.backward()
+            opt_linear.step()
     #
     model_linear.eval()
     #
@@ -76,12 +77,8 @@ def post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot):
         z_pred_f_norm = torch.norm(z_pred, p='fro', dim=1)
         for y_ in torch.unique(y):
             idxs = (y == y_).nonzero(as_tuple=True)[0].unsqueeze(-1)
-            #print(f'f pred is {z_pred_f_norm[idxs]} idxs {idxs} y {y} y_ {y_}')
             pred_frob = torch.mean(z_pred_f_norm[idxs].float())
-            #print(' pred here ', pred_frob)
             gt_frob = torch.tensor(frob_norm_pred[y_.item()]).to(device)
-            #print(' pred frob there ', pred_frob)
-            #print(' gt frob ', gt_frob)
             frob_loss += nn.functional.mse_loss(pred_frob, gt_frob)
         mse_loss = nn.functional.mse_loss(y_pred, y)
         loss = mse_loss + frob_loss
