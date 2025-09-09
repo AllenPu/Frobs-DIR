@@ -127,11 +127,11 @@ def test(model, test_loader, train_labels, args):
         shot_dict = shot_metrics(np.hstack(preds), np.hstack(labels), train_labels)
         loss_gmean = gmean(np.hstack(losses_all), axis=None).astype(float)
         print(f" * Overall: MSE {losses_mse.avg:.3f}\tL1 {losses_l1.avg:.3f}\tG-Mean {loss_gmean:.3f}")
-        print(f" * Many: MSE {shot_dict['many']['mse']:.3f}\t"
+        print(#f" * Many: MSE {shot_dict['many']['mse']:.3f}\t"
               f"L1 {shot_dict['many']['l1']:.3f}\tG-Mean {shot_dict['many']['gmean']:.3f}")
-        print(f" * Median: MSE {shot_dict['median']['mse']:.3f}\t"
+        print(#f" * Median: MSE {shot_dict['median']['mse']:.3f}\t"
               f"L1 {shot_dict['median']['l1']:.3f}\tG-Mean {shot_dict['median']['gmean']:.3f}")
-        print(f" * Low: MSE {shot_dict['low']['mse']:.3f}\t"
+        print(#f" * Low: MSE {shot_dict['low']['mse']:.3f}\t"
               f"L1 {shot_dict['low']['l1']:.3f}\tG-Mean {shot_dict['low']['gmean']:.3f}")
 
     return losses_mse.avg, losses_l1.avg, loss_gmean
