@@ -137,8 +137,9 @@ if __name__ == '__main__':
     opts = [opt_regression, opt_linear]
     loaders = [train_loader, val_loader]
     #
-    regression_peoch, linear_epoch = 10, 10
-    epochs = [regression_peoch, linear_epoch]
+    # regression epoch is for SFT, linear epoch is for train the linear mapping
+    regression_epoch, linear_epoch = 10, 10
+    epochs = [regression_epoch, linear_epoch]
     ###############################
     for e in range(args.sft_epoch):
         model_regression, model_linear = post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot, epochs)
