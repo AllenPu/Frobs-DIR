@@ -129,7 +129,7 @@ if __name__ == '__main__':
     #    model = warm_up_one_epoch(model, train_loader, opt)
     if not args.resume:
         for e in tqdm(range(args.epoch)):
-            model_regression = train_one_epoch(model_regression, train_loader)
+            model_regression = train_one_epoch(model_regression, train_loader, opt_regression)
     print('==================Before SFT===================')
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loadder, train_labels, args)
     #
