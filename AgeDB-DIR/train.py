@@ -138,7 +138,7 @@ if __name__ == '__main__':
     loaders = [train_loader, val_loader]
     #
     # regression epoch is for SFT, linear epoch is for train the linear mapping
-    regression_epoch, linear_epoch = 30, 10
+    regression_epoch, linear_epoch = 25, 10
     epochs = [regression_epoch, linear_epoch]
     ###############################
     for e in range(args.sft_epoch):
