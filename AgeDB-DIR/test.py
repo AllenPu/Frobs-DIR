@@ -111,7 +111,7 @@ def test(model, test_loader, train_labels, args):
         #
         for idx, (inputs, targets, _) in enumerate(test_loader):
             inputs, targets = inputs.cuda(non_blocking=True), targets.cuda(non_blocking=True)
-            outputs = model(inputs)
+            outputs, _ = model(inputs)
 
             preds.extend(outputs.data.cpu().numpy())
             labels.extend(targets.data.cpu().numpy())
