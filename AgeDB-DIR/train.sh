@@ -8,10 +8,12 @@
 #    done
 #done
 #####################
-for name in './trained_models/MAE.pth' './trained_models/MAE_LDS.pth' './trained_models/MSE_LDS.pth'; do
+for name in 'MAE.pth' 'MAE_LDS.pth' 'MSE_LDS.pth'; do
     for e in 10 15 20 25 30; do
         for ee in 3 4 5 6 7 8 9 10; do
-            python train.py --resume --model_name $name --regression_epoch $e --linear_epochh $ee
+        jobs_name='model_name'_${name}_'regression_epoch'_${e}_'linear_epoch'_${ee}
+        echo $jobs_name
+        python train.py --resume --model_name $name --regression_epoch $e --linear_epoch $ee
         done
     done
 done

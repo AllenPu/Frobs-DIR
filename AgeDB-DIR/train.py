@@ -32,7 +32,7 @@ parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('--warm_up_epoch', type=int, default=30)
 parser.add_argument('--epoch', type=int, default=100)
 parser.add_argument('--resume', action='store_true', help='whether use the ptrtrained model')
-parser.add_argument('--model_name', type=str, default='./trained_models/MSE.pth' )
+parser.add_argument('--model_name', type=str, default='MSE.pth' )
 parser.add_argument('--sft_epoch', type=int, default=1, help='how much epoch used to fine tune the pre-trained model for whole post-hoc')
 parser.add_argument('--linear_epoch', type=int, default=10, help='epoch to train the linear mapping')
 parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch in each post-hoc training')
@@ -42,7 +42,8 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 def build_model(args):
     if args.resume:
-        model = torch.load(args.model_name)
+        model_path = os.path.join('./trained_models/', args.model_name)
+        model = torch.load(model_path)
     else:
         model = Regression(name='resnet18')
     return model
