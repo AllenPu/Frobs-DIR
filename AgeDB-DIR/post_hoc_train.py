@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils import cal_per_label_Frob
+from utils import cal_per_label_Frob, cal_per_label_mae
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm

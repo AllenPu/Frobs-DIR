@@ -218,3 +218,35 @@ def cal_per_label_Frob(model, train_loader):
         labels = torch.cat(label)
     frob_norm = per_label_frobenius_norm(features, labels)
     return frob_norm
+
+
+
+#####################################
+def cal_per_label_mae(model, train_loader):
+    """
+    output: Tensor of shape (N, 1)
+    target: Tensor of shape (N,) with M unique labels
+    Returns: dict mapping each label to its MAE
+    """
+    labels, preds = [], []
+    with torch.no_grad():
+        for idx, (x, y, _) in enumerate(train_loader):
+            x = x.to(device)
+            y_pred, _ = model(x)
+            
+    output = output.view(-1)  # (N,)
+    target = target.view(-1)  # (N,)
+
+    unique_labels = target.unique()
+    mae_dict = {}
+
+    for label in unique_labels:
+        mask = target == label
+        if mask.sum() == 0:
+            continue
+        pred_subset = output[mask]
+        true_subset = target[mask].float()
+        mae = torch.abs(pred_subset - true_subset).mean()
+        mae_dict[int(label.item())] = mae.item()
+    #
+    return mae_dict
