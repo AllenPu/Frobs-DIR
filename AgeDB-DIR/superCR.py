@@ -39,3 +39,7 @@ def get_model(norm=False,  weight_norm= False):
     optimizer = torch.optim.SGD(model.regressor.parameters(), lr=1e-3,
                                 momentum=0.9, weight_decay=1e-4)
     return model, optimizer
+
+
+if __name__ == '__main__':
+    model = get_model()
