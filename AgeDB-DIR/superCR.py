@@ -36,6 +36,6 @@ def get_model(norm=False,  weight_norm= False):
         keys = key.replace('encoder.','')
         new_state_dict[keys] =  v
     model.encoder.load_state_dict(new_state_dict)   
-    optimizer = torch.optim.SGD(model.regressor.parameters(), lr=args.lr,
-                                momentum=args.momentum, weight_decay=args.weight_decay)
+    optimizer = torch.optim.SGD(model.regressor.parameters(), lr=1e-3,
+                                momentum=0.9, weight_decay=1e-4)
     return model, optimizer
