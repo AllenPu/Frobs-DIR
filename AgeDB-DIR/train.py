@@ -42,7 +42,10 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 def build_model(args):
     if args.resume:
-        model_path = os.path.join('./trained_models/', args.model_name)
+        model_name_str = args.model_name
+        model_names = model_name_str.split('.')
+        model_name = model_names[0]
+        model_path = os.path.join('./trained_models/', model_name)
         model = torch.load(model_path)
     else:
         model = Regression(name='resnet18')
