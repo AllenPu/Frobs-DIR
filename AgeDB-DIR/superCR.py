@@ -26,8 +26,8 @@ class Encoder_regression_single(nn.Module):
 
 
 
-def get_model(norm=False,  weight_norm= False):
-    model_name = './last.pth'
+def get_model(pthas, norm=False,  weight_norm= False):
+    model_name = paths
     model = Encoder_regression_single(name='resnet18', norm=norm, weight_norm=weight_norm)  
     ckpt = torch.load(model_name)
     new_state_dict = OrderedDict()
@@ -42,4 +42,5 @@ def get_model(norm=False,  weight_norm= False):
 
 
 if __name__ == '__main__':
-    model = get_model()
+    paths = './last.pth'
+    model = get_model(paths)
