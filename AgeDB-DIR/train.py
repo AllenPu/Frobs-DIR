@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 from test import test
 
 from resnet import *
-from utils import cal_per_label_Frob
+from utils import cal_per_label_Frob, cal_per_label_MAE
 from post_hoc_train import post_hoc_train_one_epoch
 from agedb import *
 
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     model_regression = build_model(args).to(device)
     model_linear = Linears().to(device)
     #
-    train_loader, val_loader, test_loadder, train_labels, diff_shots = load_datasets(args)
+    train_loader, val_loader, test_loader, train_labels, diff_shots = load_datasets(args)
     maj_shot, med_shot, few_shot = diff_shots
     #
     opt_regression = optim.Adam(model_regression.parameters(), lr=1e-3, weight_decay=1e-4)
@@ -130,7 +130,22 @@ if __name__ == '__main__':
         for e in tqdm(range(args.epoch)):
             model_regression = train_one_epoch(model_regression, train_loader, opt_regression)
     print('==================Before SFT===================')
-    mse_avg, l1_avg, loss_gmean = test(model_regression,test_loadder, train_labels, args)
+    #######
+    #
+    # We add this to show the train and test MAE
+    #
+    per_label_MAE_train = cal_per_label_MAE(model_regression, train_loader)
+    print('===============train============='+'\n')
+    k_train = [k for k in per_label_MAE_train.keys()]
+    print(k_train + '\n')
+    v_train = [per_label_MAE_train[k] for k in per_label_MAE_train.keys()]
+    per_label_MAE_test = cal_per_label_MAE(model_regression, test_loader)
+    print('===============test============='+'\n')
+    k_train = [k for k in per_label_MAE_test.keys()]
+    print(k_train + '\n')
+    v_train = [per_label_MAE_test[k] for k in per_label_MAE_test.keys()]
+    #######
+    mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)
     #
     models = [model_regression,model_linear]
     opts = [opt_regression, opt_linear]
@@ -144,7 +159,7 @@ if __name__ == '__main__':
         model_regression, model_linear = post_hoc_train_one_epoch(models, loaders, opts, train_labels, maj_shot, epochs)
     # test
     print('===================After SFT======================')
-    mse_avg, l1_avg, loss_gmean = test(model_regression,test_loadder, train_labels, args)
+    mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)
 
 
     #torch.save(model, './MAE.pth')
