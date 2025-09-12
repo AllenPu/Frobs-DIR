@@ -135,26 +135,39 @@ if __name__ == '__main__':
     # We add this to show the train and test MAE
     #
     per_label_MAE_train = cal_per_label_MAE(model_regression, train_loader)
-    print('===============train============='+'\n')
+    print('===============train key MAE============='+'\n')
     k_train = [k for k in per_label_MAE_train.keys()]
     print(k_train + '\n')
     v_train = [per_label_MAE_train[k] for k in per_label_MAE_train.keys()]
     print(v_train + '\n')
-    print('===============train Frobs============='+'\n')
+    print('===============train MAE============='+'\n')
     per_label_MAE_test = cal_per_label_MAE(model_regression, test_loader)
-    print('===============test============='+'\n')
+    print('===============test key MAE============='+'\n')
     k_test = [k for k in per_label_MAE_test.keys()]
     print(k_test + '\n')
     v_test = [per_label_MAE_test[k] for k in per_label_MAE_test.keys()]
     print(v_test + '\n')
-    print('===============test Frobs============='+'\n')
+    print('===============test MAE============='+'\n')
     #
     per_label_Frobs_train = cal_per_label_Frob(model_regression, train_loader)
     per_label_Frobs_test = cal_per_label_Frob(model_regression, test_loader)
     k_frobs_train = [k for k in per_label_Frobs_train.keys()]
-    k_forbs_value = [k for k in per_label_Frobs_test.keys()]
-    k_frobs_test = [per_label_Frobs_train[k] for k in per_label_Frobs_train.keys()]
+    k_frobs_test = [k for k in per_label_Frobs_test.keys()]
+    v_frobs_train = [per_label_Frobs_train[k] for k in per_label_Frobs_train.keys()]
     v_frobs_test = [per_label_Frobs_train[k] for k in per_label_Frobs_test.keys()]
+    print('===============train frobs key============='+'\n')
+    print(k_frobs_train + '\n')
+    print('===============train frobs============='+'\n')
+    print(v_frobs_train + '\n')
+    print('===============test frobs key============='+'\n')
+    print(k_frobs_test + '\n')
+    print('===============test frobs============='+'\n')
+    print(v_frobs_test + '\n')
+    ####
+
+    assert 1 == 2
+
+    
     #######
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)
     #
