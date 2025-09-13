@@ -80,16 +80,16 @@ if __name__ == '__main__':
     per_label_MAE_train = cal_per_label_mae(model, train_loader)
     print('===============train key MAE============='+'\n')
     k_train = [k for k in per_label_MAE_train.keys()]
-    print(k_train + '\n')
+    print(f'k_train is {k_train}')
     v_train = [per_label_MAE_train[k] for k in per_label_MAE_train.keys()]
-    print(v_train + '\n')
+    print(f'v_train is {v_train}')
     print('===============train MAE============='+'\n')
     per_label_MAE_test = cal_per_label_mae(model, test_loader)
     print('===============test key MAE============='+'\n')
     k_test = [k for k in per_label_MAE_test.keys()]
-    print(k_test + '\n')
+    print(f'k_test is {k_test}')
     v_test = [per_label_MAE_test[k] for k in per_label_MAE_test.keys()]
-    print(v_test + '\n')
+    print(f'v_test is {v_test}')
     print('===============test MAE============='+'\n')
     #
     per_label_Frobs_train = cal_per_label_Frob(model, train_loader)
@@ -99,10 +99,10 @@ if __name__ == '__main__':
     v_frobs_train = [per_label_Frobs_train[k] for k in per_label_Frobs_train.keys()]
     v_frobs_test = [per_label_Frobs_train[k] for k in per_label_Frobs_test.keys()]
     print('===============train frobs key============='+'\n')
-    print(k_frobs_train + '\n')
+    print(f'k_frobs_train is {k_frobs_train}')
     print('===============train frobs============='+'\n')
-    print(v_frobs_train + '\n')
+    print(f'v_frobs_train is {v_frobs_train}')
     print('===============test frobs key============='+'\n')
-    print(k_frobs_test + '\n')
+    print(f'k_frobs_test is {k_frobs_test}')
     print('===============test frobs============='+'\n')
-    print(v_frobs_test + '\n')
+    print(f'v_frobs_test is {v_frobs_test}')
