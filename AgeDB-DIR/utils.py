@@ -232,7 +232,8 @@ def cal_per_label_mae(model, train_loader):
     with torch.no_grad():
         for idx, (x, y, _) in enumerate(train_loader):
             x = x.to(device)
-            y_pred, _ = model(x)
+            y_pred = model(x)
+            print(y_pred)
             target.extend(y.squeeze(-1).tolist())
             output.extend(y_pred.cpu().squeeze(-1).tolist())
             
