@@ -4,6 +4,7 @@ from resnet import *
 from train import load_datasets
 import argparse
 from utils import cal_per_label_mae, cal_per_label_Frob
+import pandas as pd
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -106,3 +107,13 @@ if __name__ == '__main__':
     print(f'k_frobs_test is {k_frobs_test}')
     print('===============test frobs============='+'\n')
     print(f'v_frobs_test is {v_frobs_test}')
+    ################
+    df = pd.DataFrame({
+        "train MAE labels" : k_train,
+        "train MAE" : v_train,
+        "train Frobs" : v_frobs_train,
+        "test MSE labels" : k_test,
+        "test MAE" : v_test,
+        "test Frobs" : v_frobs_test
+    })
+    df.to_csv("superCR.csv", index=False)
