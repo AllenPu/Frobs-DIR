@@ -108,12 +108,17 @@ if __name__ == '__main__':
     print('===============test frobs============='+'\n')
     print(f'v_frobs_test is {v_frobs_test}')
     ################
-    df = pd.DataFrame({
+    df_train = pd.DataFrame({
         "train MAE labels" : k_train,
         "train MAE" : v_train,
         "train Frobs" : v_frobs_train,
+    })
+
+    df_test = pd.DataFrame({
         "test MSE labels" : k_test,
         "test MAE" : v_test,
         "test Frobs" : v_frobs_test
     })
-    df.to_csv("superCR.csv", index=False)
+
+    df_train.to_csv("superCR_train.csv", index=False)
+    df_test.to_csv("superCR_test.csv", index=False)
