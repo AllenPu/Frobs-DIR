@@ -5,6 +5,9 @@ from train import load_datasets
 import argparse
 from utils import cal_per_label_mae, cal_per_label_Frob
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
 parser = argparse.ArgumentParser('argument for training')
 parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], help='dataset name')
 parser.add_argument('--data_dir', type=str, default='/home/rpu2/scratch/data/imbalanced-regression/agedb-dir/data', help='data directory')
@@ -45,7 +48,8 @@ class RNC(nn.Module):
 
 
 def get_model(model_name='last.pth', regressor_name='./regressor.pth',  norm=False,  weight_norm= False):
-    model = Encoder_regression_single(name='resnet18', norm=norm, weight_norm=weight_norm)  
+    #
+    model = Encoder_regression_single(name='resnet18', norm=norm, weight_norm=weight_norm).to(device)
     # Encoder
     ckpt = torch.load(model_name)
     new_state_dict = OrderedDict()
