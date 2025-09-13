@@ -238,6 +238,7 @@ def cal_per_label_mae(model, train_loader):
             output.extend(y_pred.cpu().squeeze(-1).tolist())
             
         N = len(target)
+        print(f'N is {N}')
         output = torch.tensor(output).reshape(N,)  # (N,)
         target = torch.tensor(target).reshape(N,)  # (N,)
 
