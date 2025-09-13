@@ -42,6 +42,7 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 def build_model(args):
     if args.resume:
+        # CR : /home/rpu2/scratch/code/last/pth
         model_name = args.model_name + '.pth'
         model_path = os.path.join('./trained_models/', model_name)
         model = torch.load(model_path)
@@ -167,7 +168,7 @@ if __name__ == '__main__':
 
     assert 1 == 2
 
-    
+
     #######
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)
     #
