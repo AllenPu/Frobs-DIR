@@ -166,6 +166,14 @@ if __name__ == '__main__':
     print(f'v_frobs_test is {v_frobs_test}')
 
     ####
+    df = pd.DataFrame({
+        "train MAE labels" : k_train,
+        "train MAE" : v_train,
+        "train Frobs" : v_frobs_train,
+        "test MSE labels" : k_test,
+        "test MAE" : v_test,
+        "test Frobs" : v_frobs_test
+    })
 
     assert 1 == 2
 
