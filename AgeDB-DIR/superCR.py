@@ -22,7 +22,7 @@ class Encoder_regression_single(nn.Module):
         return pred, feat
 
 
-class RNC(nn.module):
+class RNC(nn.Module):
     def __init__(self, name='resnet18'):
         super(RNC, self).__init__()
         model_fun, dim_in = model_dict[name]
