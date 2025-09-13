@@ -57,3 +57,4 @@ if __name__ == '__main__':
     model_name = paths + 'last.pth' 
     regressor_name = paths + 'regressor.pth'
     model = get_model(model_name, regressor_name)
+    print('model loaded')
