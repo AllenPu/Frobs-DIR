@@ -49,7 +49,7 @@ def get_model(model_name='last.pth', regressor_name='./regressor.pth',  norm=Fal
     #
     regressor = torch.load(regressor_name)
     model.regressor.load_state_dict(regressor['state_dict'])
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3,
+    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3,
                                 momentum=0.9, weight_decay=1e-4)
     return model, optimizer
 
