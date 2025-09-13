@@ -53,6 +53,7 @@ def get_model(model_name='last.pth', regressor_name='./regressor.pth',  norm=Fal
 
 
 if __name__ == '__main__':
-    model_name = './last.pth'
-    regressor_name = './regressor.pth'
-    model = get_model()
+    paths = './'
+    model_name = paths + 'last.pth' 
+    regressor_name = paths + 'regressor.pth'
+    model = get_model(model_name, regressor_name)
