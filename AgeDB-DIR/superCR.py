@@ -89,7 +89,7 @@ if __name__ == '__main__':
     print('===============test MAE============='+'\n')
     #
     per_label_Frobs_train = cal_per_label_Frob(model, train_loader)
-    per_label_Frobs_test = cal_per_label_Frob(model test_loader)
+    per_label_Frobs_test = cal_per_label_Frob(model, test_loader)
     k_frobs_train = [k for k in per_label_Frobs_train.keys()]
     k_frobs_test = [k for k in per_label_Frobs_test.keys()]
     v_frobs_train = [per_label_Frobs_train[k] for k in per_label_Frobs_train.keys()]
