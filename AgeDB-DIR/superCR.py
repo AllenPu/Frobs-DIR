@@ -3,7 +3,7 @@ from collections import OrderedDict
 from resnet import *
 from train import load_datasets
 import argparse
-from utils import cal_per_label_MAE, cal_per_label_Frob
+from utils import cal_per_label_mae, cal_per_label_Frob
 
 parser = argparse.ArgumentParser('argument for training')
 parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], help='dataset name')
@@ -73,14 +73,14 @@ if __name__ == '__main__':
     train_loader, val_loader, test_loader, train_labels, diff_shots = load_datasets(args)
     maj_shot, med_shot, few_shot = diff_shots
     #######
-    per_label_MAE_train = cal_per_label_MAE(model, train_loader)
+    per_label_MAE_train = cal_per_label_mae(model, train_loader)
     print('===============train key MAE============='+'\n')
     k_train = [k for k in per_label_MAE_train.keys()]
     print(k_train + '\n')
     v_train = [per_label_MAE_train[k] for k in per_label_MAE_train.keys()]
     print(v_train + '\n')
     print('===============train MAE============='+'\n')
-    per_label_MAE_test = cal_per_label_MAE(model, test_loader)
+    per_label_MAE_test = cal_per_label_mae(model, test_loader)
     print('===============test key MAE============='+'\n')
     k_test = [k for k in per_label_MAE_test.keys()]
     print(k_test + '\n')

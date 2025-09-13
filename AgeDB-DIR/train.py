@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 from test import test
 
 from resnet import *
-from utils import cal_per_label_Frob, cal_per_label_MAE
+from utils import cal_per_label_Frob, cal_per_label_mae
 from post_hoc_train import post_hoc_train_one_epoch
 from agedb import *
 
@@ -135,14 +135,14 @@ if __name__ == '__main__':
     #
     # We add this to show the train and test MAE
     #
-    per_label_MAE_train = cal_per_label_MAE(model_regression, train_loader)
+    per_label_MAE_train = cal_per_label_mae(model_regression, train_loader)
     print('===============train key MAE============='+'\n')
     k_train = [k for k in per_label_MAE_train.keys()]
     print(k_train + '\n')
     v_train = [per_label_MAE_train[k] for k in per_label_MAE_train.keys()]
     print(v_train + '\n')
     print('===============train MAE============='+'\n')
-    per_label_MAE_test = cal_per_label_MAE(model_regression, test_loader)
+    per_label_MAE_test = cal_per_label_mae(model_regression, test_loader)
     print('===============test key MAE============='+'\n')
     k_test = [k for k in per_label_MAE_test.keys()]
     print(k_test + '\n')
