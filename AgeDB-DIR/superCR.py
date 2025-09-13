@@ -70,7 +70,7 @@ if __name__ == '__main__':
     paths = '/home/rpu2/scratch/code/rnc_agedb/'
     model_name = paths + 'last.pth' 
     regressor_name = paths + 'regressor.pth'
-    model = get_model(model_name, regressor_name)
+    model, _ = get_model(model_name, regressor_name)
     print('model loaded')
     #######
     args = parser.parse_args()
