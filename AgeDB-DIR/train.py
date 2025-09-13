@@ -178,6 +178,12 @@ if __name__ == '__main__':
         "test Frobs" : v_frobs_test
     })
 
+
+    df_train.to_csv(f"{args.model_name}_train.csv", index=False)
+    df_test.to_csv(f"{args.model_name}_test.csv", index=False)
+
+
+
     assert 1 == 2
 
 
