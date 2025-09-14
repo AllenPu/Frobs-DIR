@@ -41,6 +41,7 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 
 def build_model(args):
+    prefix = ''
     if args.resume:
         # CR : /home/rpu2/scratch/code/last/pth
         model_name = args.model_name + '.pth'
