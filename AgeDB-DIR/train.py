@@ -1,6 +1,4 @@
-import time
 import argparse
-import logging
 from tqdm import tqdm
 import pandas as pd
 from collections import defaultdict
