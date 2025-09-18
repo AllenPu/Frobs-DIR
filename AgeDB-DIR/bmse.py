@@ -42,6 +42,7 @@ parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('--epoch', type=int, default=100)
 parser.add_argument('--resume', action='store_true', help='whether use the ptrtrained model')
 parser.add_argument('--model_name', type=str, default='B-MSE' )
+parser.add_argument('--model_path', type=str, default='pre-trained path to BMSE pth' )
 
 
 if __name__ == '__main__':
@@ -50,16 +51,19 @@ if __name__ == '__main__':
     train_loader, val_loader, test_loader, train_labels, _ = load_datasets(args)
     opt = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     bmc = BMCLoss(init_noise_sigma=10.0)
-    for e in tqdm(range(args.epoch)):
-        for idx, (x, y, _) in enumerate(train_loader):
-            x,y = x.to(device), y.to(device)
-            y_pred, _ = model(x)
-            #loss_mse = torch.nn.functional.mse_loss(y, y_pred, reduction='none')
-            #loss_mse = torch.mean(torch.abs(y -  y_pred))
-            loss = bmc(y_pred, y)
-            opt.zero_grad()
-            loss.backward()
-            opt.step()
+    if not args.resume:
+        for e in tqdm(range(args.epoch)):
+            for idx, (x, y, _) in enumerate(train_loader):
+                x,y = x.to(device), y.to(device)
+                y_pred, _ = model(x)
+                #loss_mse = torch.nn.functional.mse_loss(y, y_pred, reduction='none')
+                #loss_mse = torch.mean(torch.abs(y -  y_pred))
+                loss = bmc(y_pred, y)
+                opt.zero_grad()
+                loss.backward()
+                opt.step()
+    else:
+        model = torch.load(args.model_path)
     mse_avg, l1_avg, loss_gmean = test(model,test_loader, train_labels, args)
     #
     torch.save(model, './trained_models/bmse.pth')
