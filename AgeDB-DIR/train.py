@@ -39,10 +39,10 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 
 def build_model(args):
-    prefix = ''
     # we can load any model with .pth
     #
     if args.resume:
+        #prefix = ''
         # CR : /home/rpu2/scratch/code/last/pth
         model_name = args.model_name + '.pth'
         model_path = os.path.join('./trained_models/', model_name)
