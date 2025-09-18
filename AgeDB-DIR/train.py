@@ -136,6 +136,7 @@ if __name__ == '__main__':
     #
     # We add this to show the train and test MAE
     #
+    '''
     per_label_MAE_train = cal_per_label_mae(model_regression, train_loader)
     print('===============train key MAE============='+'\n')
     k_train = [k for k in per_label_MAE_train.keys()]
@@ -186,6 +187,7 @@ if __name__ == '__main__':
 
 
     assert 1 == 2
+    '''
     #
     # we stop here because we want to record the Frobenius norm only
     # if we want to implement the post-hoc-train, start here and remove assert
