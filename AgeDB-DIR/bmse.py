@@ -64,4 +64,4 @@ if __name__ == '__main__':
     mse_avg, l1_avg, loss_gmean = test(model,test_loader, train_labels, args)
     #
     torch.save(model, './pretrained_models/bmse.pth')
-    
+    #
