@@ -49,7 +49,7 @@ if __name__ == '__main__':
     model = build_model(args).to(device)
     train_loader, val_loader, test_loader, train_labels, _ = load_datasets(args)
     opt = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
-    bmc = BMCLoss(init_noise_sigma=10)
+    bmc = BMCLoss(init_noise_sigma=10.0)
     for e in tqdm(range(args.epoch)):
         for idx, (x, y, _) in enumerate(train_loader):
             loss = 0
