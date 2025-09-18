@@ -1,3 +1,6 @@
+########
+# the meperical is used to measure the distance between the labels for (KBS)
+########
 from resnet import *
 import torch
 from collections import OrderedDict
