@@ -1,6 +1,4 @@
-import time
 import argparse
-import logging
 from tqdm import tqdm
 import pandas as pd
 from collections import defaultdict
@@ -41,8 +39,10 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 
 def build_model(args):
-    prefix = ''
+    # we can load any model with .pth
+    #
     if args.resume:
+        #prefix = ''
         # CR : /home/rpu2/scratch/code/last/pth
         model_name = args.model_name + '.pth'
         model_path = os.path.join('./trained_models/', model_name)
@@ -136,6 +136,7 @@ if __name__ == '__main__':
     #
     # We add this to show the train and test MAE
     #
+    '''
     per_label_MAE_train = cal_per_label_mae(model_regression, train_loader)
     print('===============train key MAE============='+'\n')
     k_train = [k for k in per_label_MAE_train.keys()]
@@ -186,7 +187,11 @@ if __name__ == '__main__':
 
 
     assert 1 == 2
-
+    '''
+    #
+    # we stop here because we want to record the Frobenius norm only
+    # if we want to implement the post-hoc-train, start here and remove assert
+    #
 
     #######
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)
