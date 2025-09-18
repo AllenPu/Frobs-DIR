@@ -53,7 +53,7 @@ if __name__ == '__main__':
     for e in tqdm(range(args.epoch)):
         for idx, (x, y, _) in enumerate(train_loader):
             loss = 0
-            x,y,w = x.to(device), y.to(device), w.to(device)
+            x,y = x.to(device), y.to(device)
             y_pred, _ = model(x)
             #loss_mse = torch.nn.functional.mse_loss(y, y_pred, reduction='none')
             #loss_mse = torch.mean(torch.abs(y -  y_pred))
