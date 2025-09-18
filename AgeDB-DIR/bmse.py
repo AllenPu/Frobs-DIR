@@ -19,7 +19,7 @@ def bmc_loss(pred, target, noise_var):
       loss: A float tensor. Balanced MSE Loss.
     """
     logits = - (pred - target.T).pow(2) / (2 * noise_var)   # logit size: [batch, batch]
-    loss = F.cross_entropy(logits, torch.arange(pred.shape[0]))     # contrastive-like loss
+    loss = F.cross_entropy(logits, torch.arange(pred.shape[0]).to(device))     # contrastive-like loss
     loss = loss * (2 * noise_var).detach()  # optional: restore the loss scale, 'detach' when noise is learnable 
 
     return loss
