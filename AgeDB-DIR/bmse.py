@@ -52,12 +52,11 @@ if __name__ == '__main__':
     bmc = BMCLoss(init_noise_sigma=10.0)
     for e in tqdm(range(args.epoch)):
         for idx, (x, y, _) in enumerate(train_loader):
-            loss = 0
             x,y = x.to(device), y.to(device)
             y_pred, _ = model(x)
             #loss_mse = torch.nn.functional.mse_loss(y, y_pred, reduction='none')
             #loss_mse = torch.mean(torch.abs(y -  y_pred))
-            loss += bmc(y_pred, y)
+            loss = bmc(y_pred, y)
             opt.zero_grad()
             loss.backward()
             opt.step()
