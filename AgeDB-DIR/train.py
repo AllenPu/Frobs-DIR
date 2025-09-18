@@ -184,7 +184,10 @@ if __name__ == '__main__':
 
 
     assert 1 == 2
-
+    #
+    # we stop here because we want to record the Frobenius norm only
+    # if we want to implement the post-hoc-train, start here and remove assert
+    #
 
     #######
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)

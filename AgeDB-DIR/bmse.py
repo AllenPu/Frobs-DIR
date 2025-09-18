@@ -62,9 +62,11 @@ if __name__ == '__main__':
                 opt.zero_grad()
                 loss.backward()
                 opt.step()
+        #
+        mse_avg, l1_avg, loss_gmean = test(model,test_loader, train_labels, args)
+        torch.save(model, './trained_models/bmse.pth')
     else:
         model = torch.load(args.model_path)
-    mse_avg, l1_avg, loss_gmean = test(model,test_loader, train_labels, args)
-    #
-    torch.save(model, './trained_models/bmse.pth')
-    #
+        mse_avg, l1_avg, loss_gmean = test(model,test_loader, train_labels, args)
+        #
+        
