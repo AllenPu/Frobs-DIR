@@ -162,8 +162,9 @@ def indices_of_B_in_A(A, B, C):
     """
     mask = np.isin(B, A)       # boolean mask: True where B[i] is in A
     idx = np.nonzero(mask)[0]  # indices
+    Bsel = B[idx]
     Csel = C[idx]
-    return idx, Csel
+    return idx, Bsel,  Csel
 
 
 ##################################
