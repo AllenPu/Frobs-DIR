@@ -5,6 +5,8 @@ import logging
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal.windows import triang
+from fast_soft_sort.pytorch_ops import soft_rank, soft_sort
+
 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -273,3 +275,8 @@ def cal_per_label_mae(model, train_loader):
             mae_dict[int(label.item())] = mae.item()
     #
     return mae_dict
+
+###################################################
+def frobs_sort_loss(frobs, labels):
+    # shape of the label (N,1)
+    label_values, label_indices = torch.sort(labels, dim=0)
