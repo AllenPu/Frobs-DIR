@@ -149,6 +149,24 @@ def match_A_in_B(A: torch.Tensor, B: list):
     return idx_in_a, vals
 
 
+# return the element in C with the indice of A in B
+def indices_of_B_in_A(A, B, C):
+    """
+    A: list (values to keep)
+    B: 1D numpy array
+    C: optional 1D numpy array aligned with B
+
+    Returns:
+        idx  : 1D numpy array of indices in B where B[i] ∈ A
+        Csel : C[idx]
+    """
+    mask = np.isin(B, A)       # boolean mask: True where B[i] is in A
+    idx = np.nonzero(mask)[0]  # indices
+    Bsel = B[idx]
+    Csel = C[idx]
+    return idx, Bsel,  Csel
+
+
 ##################################
 # return the prototype of each label for the whole datasets
 def cal_prototype(model, train_loader):

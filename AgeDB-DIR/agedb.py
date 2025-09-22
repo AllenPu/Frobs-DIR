@@ -89,19 +89,31 @@ class AgeDB(data.Dataset):
             train_labels = df['age']
             train_class_count,  per_shot_count = [],  {}
             many_shot, med_shot, few_shot = [], [], []
+            # key : index of the train_class_count
+            train_shot_dict = {} 
+            # set a dictionary where each label corresponds to a 0/1/2
+            pair_shot = {}
+            index = 0
             for l in np.unique(train_labels):
                 train_class_count.append(len(
                     train_labels[train_labels == l]))
-            train_shot_dict = {}
+                train_shot_dict[index] = l
+                index = index + 1
+            #
             for i in range(len(train_class_count)):
                 if train_class_count[i] > 100:
-                    many_shot.append(i)
+                    many_shot.append(train_shot_dict[i])
+                    pair_shot[train_shot_dict[i]] = 0
                 #train_shot_dict[i] = 0
                 elif train_class_count[i] < 20:
-                    few_shot.append(i)
+                    few_shot.append(train_shot_dict[i])
+                    pair_shot[train_shot_dict[i]] = 1
                 else:
-                    med_shot.append(i)
+                    med_shot.append(train_shot_dict[i])
+                    pair_shot[train_shot_dict[i]] = 2
                 ##########################
-                
+            self.pair_shot = pair_shot
             #
             return many_shot, med_shot, few_shot
+        
+
