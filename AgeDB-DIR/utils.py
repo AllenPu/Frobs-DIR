@@ -261,6 +261,9 @@ def cal_per_label_mae(model, train_loader):
         #print(f'N is {N}')
         output = torch.tensor(output).reshape(N,)  # (N,)
         target = torch.tensor(target).reshape(N,)  # (N,)
+        #
+        maes = torch.mean(torch.abs(output - target))
+        print(f'Overall MAE is {maes.item()}')
 
         unique_labels = target.unique()
         mae_dict = {}
