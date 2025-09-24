@@ -4,7 +4,7 @@ import pandas as pd
 from collections import defaultdict
 from scipy.stats import gmean
 from tqdm import tqdm
-
+from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -37,18 +37,33 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 
 
-
+'''
 def build_model(args):
     # we can load any model with .pth
     #
     if args.resume:
         #prefix = ''
-        # CR : /home/rpu2/scratch/code/last/pth
+        # CR : 
+        #model_path = '/home/rpu2/scratch/code/last.pth'
         model_name = args.model_name + '.pth'
         model_path = os.path.join('./trained_models/', model_name)
         model = torch.load(model_path)
     else:
         model = Regression(name='resnet18')
+    return model
+'''
+
+def build_model(args):
+    model = Regression(name='resnet18')
+    ckpt = torch.load('/home/rpu2/scratch/code/rnc_agedb/last.pth')
+    new_state_dict = OrderedDict()
+    for k,v in ckpt['model'].items():
+        key = k.replace('module.','')
+        keys = key.replace('encoder.','')
+        new_state_dict[keys] =  v
+    model.encoder.load_state_dict(new_state_dict)
+    ckpt_regressor =  torch.load('/home/rpu2/scratch/code/rnc_agedb/regressor.pth')                          
+    model.regressor.load_state_dict()
     return model
 
 
