@@ -48,7 +48,7 @@ def build_model(args):
                      kernel='gaussian', ks=9, sigma=1, momentum=0.9,
                      return_features=True)
         # ranksim
-        checkpoint = torch.load('/home/rpu2/scratch/code/Con-R/agedb-dir/checkpoint/agedb_resnet50ConR_4.0_w=1.0_adam_l1_0.00025_64_2025-09-19-18:36:40.853379/ckpt.best.pth.tar')
+        checkpoint = torch.load('/home/rpu2/scratch/code/ranksim/agedb-dir/checkpoint/agedb_resnet18_reg100.0_il2.0_adam_l1_0.00025_256_2025-09-24-06:52:59.565226/ckpt.best.pth.tar')
         # Con-R
         #checkpoint = torch.load('/home/rpu2/scratch/code/Con-R/agedb-dir/checkpoint/agedb_resnet50ConR_4.0_w=1.0_adam_l1_0.00025_64_2025-09-19-18:36:40.853379/ckpt.best.pth.tar')
         model.load_state_dict(checkpoint['state_dict'], strict=False)
