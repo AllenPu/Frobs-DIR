@@ -1,4 +1,7 @@
 # model struture follows the  LDS/Con-R/RankSim
+
+
+
 # Copyright (c) 2023-present, Royal Bank of Canada.
 # Copyright (c) 2021-present, Yuzhe Yang
 # All rights reserved.
@@ -280,7 +283,7 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def forward(self, x, targets=None, epoch=None,reg = True):
+    def forward(self, x, targets=None, epoch=None):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -295,7 +298,7 @@ class ResNet(nn.Module):
 
         encoding_s = encoding
 
-        if self.training and self.fds and reg:
+        if self.training and self.fds:
             if epoch >= self.start_smooth:
                 encoding_s = self.FDS.smooth(encoding_s, targets, epoch)
 

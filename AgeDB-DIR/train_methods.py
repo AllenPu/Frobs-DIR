@@ -43,7 +43,10 @@ def build_model(args):
     #
     if args.resume:
         #prefix = ''
-        model = resnet18()
+        model = resnet18(fds=False, bucket_num=100, bucket_start=3,
+                     start_update=0, start_smooth=1,
+                     kernel='gaussian', ks=9, sigma=1, momentum=0.9,
+                     return_features=True)
         checkpoint = torch.load('/home/rpu2/scratch/code/Con-R/agedb-dir/checkpoint/agedb_resnet50ConR_4.0_w=1.0_adam_l1_0.00025_64_2025-09-19-18:36:40.853379/ckpt.best.pth.tar')
         model.load_state_dict(checkpoint['state_dict'], strict=False)
         print(f"===> Checkpoint '{args.resume}' loaded (epoch [{checkpoint['epoch']}]), testing...")
