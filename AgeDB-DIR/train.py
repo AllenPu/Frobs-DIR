@@ -37,7 +37,7 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 
 
-
+'''
 def build_model(args):
     # we can load any model with .pth
     #
@@ -51,8 +51,25 @@ def build_model(args):
     else:
         model = Regression(name='resnet18')
     return model
+'''
 
-
+def build_model(args):
+    model = Regression(name='resnet18')
+    ckpt = torch.load('/home/rpu2/scratch/code/rnc_agedb/last.pth')
+    new_state_dict = OrderedDict()
+    for k,v in ckpt['model'].items():
+        key = k.replace('module.','')
+        keys = key.replace('encoder.','')
+        new_state_dict[keys] =  v
+    model.encoder.load_state_dict(new_state_dict)
+    # load regressor
+    ckpt_regressor =  torch.load('/home/rpu2/scratch/code/rnc_agedb/regressor.pth')                          
+    regressor_state_dict = OrderedDict()
+    for k,v in ckpt_regressor['state_dict'].items():
+        k = '0.' + k
+        regressor_state_dict[k] =  v
+    model.regressor.load_state_dict(regressor_state_dict)
+    return model
 
 
 def load_datasets(args):
