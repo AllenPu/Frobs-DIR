@@ -43,10 +43,11 @@ def build_model(args):
     #
     if args.resume:
         #prefix = ''
+        model = resnet18()
+        checkpoint = torch.load('/home/rpu2/scratch/code/Con-R/agedb-dir/checkpoint/agedb_resnet50ConR_4.0_w=1.0_adam_l1_0.00025_64_2025-09-19-18:36:40.853379/ckpt.best.pth.tar')
+        model.load_state_dict(checkpoint['state_dict'], strict=False)
+        print(f"===> Checkpoint '{args.resume}' loaded (epoch [{checkpoint['epoch']}]), testing...")
         # CR : /home/rpu2/scratch/code/last/pth
-        model_name = args.model_name + '.pth'
-        model_path = os.path.join('./trained_models/', model_name)
-        model = torch.load(model_path)
     else:
         model = Regression(name='resnet18')
     return model
