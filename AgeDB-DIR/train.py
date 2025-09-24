@@ -106,7 +106,7 @@ def train_one_epoch(model, train_loader, opt):
         opt.zero_grad()
         loss.backward()
         opt.step()
-    mse_avg, l1_avg, loss_gmean = test(model,test_loader, train_labels, args)
+    #mse_avg, l1_avg, loss_gmean = test(model,test_loader, train_labels, args)
     #print(f' Maj MAE {} Med MAE {} Few MAE {}')
     return model
    
