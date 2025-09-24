@@ -317,3 +317,14 @@ def resnet18(**kwargs):
 
 def resnet50(**kwargs):
     return ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+
+
+# y = ax + b , where x and y is 1-d
+class Linears(nn.Module):
+    def __init__(self):
+        super(Linears, self).__init__()
+        self.linear = nn.Linear(in_features=1, out_features=1, bias=True)
+
+    def forward(self, y):
+        f_hat = torch.nn.functional.softplus(self.linear(y))
+        return f_hat
