@@ -142,7 +142,7 @@ if __name__ == '__main__':
     # we stop here because we want to record the Frobenius norm only
     # if we want to implement the post-hoc-train, start here and remove assert
     #
-
+    cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_name='RankSim_SFT')
     #######
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)
     #
