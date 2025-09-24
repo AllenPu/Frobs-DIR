@@ -66,9 +66,8 @@ def build_model(args):
     ckpt_regressor =  torch.load('/home/rpu2/scratch/code/rnc_agedb/regressor.pth')                          
     regressor_state_dict = OrderedDict()
     for k,v in ckpt_regressor['state_dict'].items():
-        print(k, v)
         k = '0.' + k
-        regressor_state_dict[k] = '0.' + v
+        regressor_state_dict[k] =  v
     model.regressor.load_state_dict(regressor_state_dict)
     return model
 
