@@ -98,13 +98,16 @@ def train_one_epoch(model, train_loader, opt):
         x,y,w = x.to(device), y.to(device), w.to(device)
         y_pred, _ = model(x)
         #loss_mse = torch.nn.functional.mse_loss(y, y_pred, reduction='none')
-        loss_mse = torch.mean(torch.abs(y -  y_pred))
+        # change  the loss from MAE to MSE
+        loss_mse = torch.mean(torch.abs(y -  y_pred)**2)
         # LDS
         #loss_mse = torch.mean(loss_mse * w.expand_as(loss_mse))
         loss += loss_mse
         opt.zero_grad()
         loss.backward()
         opt.step()
+    mse_avg, l1_avg, loss_gmean = test(model,test_loader, train_labels, args)
+    #print(f' Maj MAE {} Med MAE {} Few MAE {}')
     return model
    
 
@@ -187,7 +190,6 @@ if __name__ == '__main__':
 
 
     assert 1 == 2
-    '''
     #
     # we stop here because we want to record the Frobenius norm only
     # if we want to implement the post-hoc-train, start here and remove assert
@@ -216,3 +218,4 @@ if __name__ == '__main__':
     #
     #
     # to do : calcualte the distance between the majority and minority
+    '''
