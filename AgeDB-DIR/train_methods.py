@@ -161,7 +161,7 @@ if __name__ == '__main__':
     print('===================After SFT======================')
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)
     #
-    cal_per_label_frobs_mae(model_regression, train_loader, test_loader, args.model_name)
+    cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_name='RankSim_SFT')
 
     #torch.save(model, './MAE.pth')
     # this can be written for SDE-EDG
