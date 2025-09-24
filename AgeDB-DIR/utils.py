@@ -285,6 +285,9 @@ def cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_n
     v_train = [per_label_MAE_train[k] for k in per_label_MAE_train.keys()]
     print(f'v_train is {v_train}')
     print('===============train MAE============='+'\n')
+    #
+    assert 1==3
+    #
     per_label_MAE_test = cal_per_label_mae(model_regression, test_loader)
     print('===============test key MAE============='+'\n')
     k_test = [k for k in per_label_MAE_test.keys()]
@@ -320,7 +323,6 @@ def cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_n
         "test MAE" : v_test,
         "test Frobs" : v_frobs_test
     })
-
 
     df_train.to_csv(f"{model_name}_train.csv", index=False)
     df_test.to_csv(f"{model_name}_test.csv", index=False)
