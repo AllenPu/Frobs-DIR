@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 #from tensorboard_logger import Logger
 from test import test
 
-from resnet import *
+from model import *
 from utils import cal_per_label_Frob, cal_per_label_mae, cal_per_label_frobs_mae
 from post_hoc_train import post_hoc_train_one_epoch
 from agedb import *
@@ -48,8 +48,7 @@ def build_model(args):
         model.load_state_dict(checkpoint['state_dict'], strict=False)
         print(f"===> Checkpoint '{args.resume}' loaded (epoch [{checkpoint['epoch']}]), testing...")
         # CR : /home/rpu2/scratch/code/last/pth
-    else:
-        model = Regression(name='resnet18')
+    
     return model
 
 
