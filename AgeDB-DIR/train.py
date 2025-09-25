@@ -37,7 +37,6 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 
 
-'''
 def build_model(args):
     # we can load any model with .pth
     #
@@ -71,6 +70,7 @@ def build_model(args):
     model.regressor.load_state_dict(regressor_state_dict)
     return model
 
+'''
 
 def load_datasets(args):
     df = pd.read_csv(os.path.join(args.data_dir, f"{args.dataset}.csv"))
