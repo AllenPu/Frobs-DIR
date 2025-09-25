@@ -136,11 +136,12 @@ if __name__ == '__main__':
     #
     # We add this to show the train and test MAE
     #
-    '''
+    
     per_label_MAE_train = cal_per_label_mae(model_regression, train_loader)
     print('===============train key MAE============='+'\n')
     k_train = [k for k in per_label_MAE_train.keys()]
     print(f'k_train is {k_train}')
+    '''
     v_train = [per_label_MAE_train[k] for k in per_label_MAE_train.keys()]
     print(f'v_train is {v_train}')
     print('===============train MAE============='+'\n')
