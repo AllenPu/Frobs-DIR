@@ -6,7 +6,7 @@ import numpy as np
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal.windows import triang
 from fast_soft_sort.pytorch_ops import soft_rank, soft_sort
-
+import pandas as pd
 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -261,6 +261,9 @@ def cal_per_label_mae(model, train_loader):
         #print(f'N is {N}')
         output = torch.tensor(output).reshape(N,)  # (N,)
         target = torch.tensor(target).reshape(N,)  # (N,)
+        #
+        maes = torch.mean(torch.abs(output - target))
+        print(f'Overall MAE is {maes.item()}')
 
         unique_labels = target.unique()
         mae_dict = {}
@@ -277,6 +280,51 @@ def cal_per_label_mae(model, train_loader):
     return mae_dict
 
 ###################################################
-def frobs_sort_loss(frobs, labels):
-    # shape of the label (N,1)
-    label_values, label_indices = torch.sort(labels, dim=0)
+def cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_name=''):
+    per_label_MAE_train = cal_per_label_mae(model_regression, train_loader)
+    print('===============train key MAE============='+'\n')
+    k_train = [k for k in per_label_MAE_train.keys()]
+    print(f'k_train is {k_train}')
+    v_train = [per_label_MAE_train[k] for k in per_label_MAE_train.keys()]
+    print(f'v_train is {v_train}')
+    print('===============train MAE============='+'\n')
+    #
+    per_label_MAE_test = cal_per_label_mae(model_regression, test_loader)
+    print('===============test key MAE============='+'\n')
+    k_test = [k for k in per_label_MAE_test.keys()]
+    print(f'k_test is {k_test}')
+    v_test = [per_label_MAE_test[k] for k in per_label_MAE_test.keys()]
+    print(f'v_test is {v_test}')
+    print('===============test MAE============='+'\n')
+    #
+    per_label_Frobs_train = cal_per_label_Frob(model_regression, train_loader)
+    per_label_Frobs_test = cal_per_label_Frob(model_regression, test_loader)
+    k_frobs_train = [k for k in per_label_Frobs_train.keys()]
+    k_frobs_test = [k for k in per_label_Frobs_test.keys()]
+    v_frobs_train = [per_label_Frobs_train[k] for k in per_label_Frobs_train.keys()]
+    v_frobs_test = [per_label_Frobs_train[k] for k in per_label_Frobs_test.keys()]
+    print('===============train frobs key============='+'\n')
+    print(f'k_frobs_train is {k_frobs_train}')
+    print('===============train frobs============='+'\n')
+    print(f'v_frobs_train is {v_frobs_train}')
+    print('===============test frobs key============='+'\n')
+    print(f'k_frobs_test is {k_frobs_test}')
+    print('===============test frobs============='+'\n')
+    print(f'v_frobs_test is {v_frobs_test}')
+    
+    assert 1==3
+    ####
+    df_train = pd.DataFrame({
+        "train MAE labels" : k_train,
+        "train MAE" : v_train,
+        "train Frobs" : v_frobs_train,
+    })
+
+    df_test = pd.DataFrame({
+        "test MSE labels" : k_test,
+        "test MAE" : v_test,
+        "test Frobs" : v_frobs_test
+    })
+
+    df_train.to_csv(f"{model_name}_train.csv", index=False)
+    df_test.to_csv(f"{model_name}_test.csv", index=False)

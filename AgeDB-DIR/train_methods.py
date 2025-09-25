@@ -4,7 +4,7 @@ import pandas as pd
 from collections import defaultdict
 from scipy.stats import gmean
 from tqdm import tqdm
-from collections import OrderedDict
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader, TensorDataset, ConcatDataset
 #from tensorboard_logger import Logger
 from test import test
 
-from resnet import *
+from model import *
 from utils import cal_per_label_Frob, cal_per_label_mae, cal_per_label_frobs_mae
 from post_hoc_train import post_hoc_train_one_epoch
 from agedb import *
@@ -37,39 +37,27 @@ parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch 
 
 
 
-'''
+
 def build_model(args):
     # we can load any model with .pth
     #
     if args.resume:
         #prefix = ''
-        # CR : 
-        #model_path = '/home/rpu2/scratch/code/last.pth'
-        model_name = args.model_name + '.pth'
-        model_path = os.path.join('./trained_models/', model_name)
-        model = torch.load(model_path)
-    else:
-        model = Regression(name='resnet18')
+        model = resnet18(fds=False, bucket_num=100, bucket_start=3,
+                     start_update=0, start_smooth=1,
+                     kernel='gaussian', ks=9, sigma=1, momentum=0.9,
+                     return_features=True)
+        # ranksim
+        checkpoint = torch.load('/home/rpu2/scratch/code/ranksim/agedb-dir/checkpoint/agedb_resnet18_reg100.0_il2.0_adam_l1_0.00025_256_2025-09-24-06:52:59.565226/ckpt.best.pth.tar')
+        # Con-R
+        #checkpoint = torch.load('/home/rpu2/scratch/code/Con-R/agedb-dir/checkpoint/agedb_resnet50ConR_4.0_w=1.0_adam_l1_0.00025_64_2025-09-19-18:36:40.853379/ckpt.best.pth.tar')
+        model.load_state_dict(checkpoint['state_dict'], strict=False)
+        model.load_state_dict(checkpoint['state_dict'], strict=False)
+        print(f"===> Checkpoint '{args.resume}' loaded (epoch [{checkpoint['epoch']}]), testing...")
+        # CR : /home/rpu2/scratch/code/last/pth
+    
     return model
-'''
 
-def build_model(args):
-    model = Regression(name='resnet18')
-    ckpt = torch.load('/home/rpu2/scratch/code/rnc_agedb/last.pth')
-    new_state_dict = OrderedDict()
-    for k,v in ckpt['model'].items():
-        key = k.replace('module.','')
-        keys = key.replace('encoder.','')
-        new_state_dict[keys] =  v
-    model.encoder.load_state_dict(new_state_dict)
-    # load regressor
-    ckpt_regressor =  torch.load('/home/rpu2/scratch/code/rnc_agedb/regressor.pth')                          
-    regressor_state_dict = OrderedDict()
-    for k,v in ckpt_regressor['state_dict'].items():
-        k = '0.' + k
-        regressor_state_dict[k] =  v
-    model.regressor.load_state_dict(regressor_state_dict)
-    return model
 
 
 def load_datasets(args):
@@ -158,65 +146,17 @@ if __name__ == '__main__':
     #
     # We add this to show the train and test MAE
     #
-    '''
-    per_label_MAE_train = cal_per_label_mae(model_regression, train_loader)
-    print('===============train key MAE============='+'\n')
-    k_train = [k for k in per_label_MAE_train.keys()]
-    print(f'k_train is {k_train}')
-    v_train = [per_label_MAE_train[k] for k in per_label_MAE_train.keys()]
-    print(f'v_train is {v_train}')
-    print('===============train MAE============='+'\n')
-    per_label_MAE_test = cal_per_label_mae(model_regression, test_loader)
-    print('===============test key MAE============='+'\n')
-    k_test = [k for k in per_label_MAE_test.keys()]
-    print(f'k_test is {k_test}')
-    v_test = [per_label_MAE_test[k] for k in per_label_MAE_test.keys()]
-    print(f'v_test is {v_test}')
-    print('===============test MAE============='+'\n')
-    #
-    per_label_Frobs_train = cal_per_label_Frob(model_regression, train_loader)
-    per_label_Frobs_test = cal_per_label_Frob(model_regression, test_loader)
-    k_frobs_train = [k for k in per_label_Frobs_train.keys()]
-    k_frobs_test = [k for k in per_label_Frobs_test.keys()]
-    v_frobs_train = [per_label_Frobs_train[k] for k in per_label_Frobs_train.keys()]
-    v_frobs_test = [per_label_Frobs_train[k] for k in per_label_Frobs_test.keys()]
-    print('===============train frobs key============='+'\n')
-    print(f'k_frobs_train is {k_frobs_train}')
-    print('===============train frobs============='+'\n')
-    print(f'v_frobs_train is {v_frobs_train}')
-    print('===============test frobs key============='+'\n')
-    print(f'k_frobs_test is {k_frobs_test}')
-    print('===============test frobs============='+'\n')
-    print(f'v_frobs_test is {v_frobs_test}')
-
-    ####
-    df_train = pd.DataFrame({
-        "train MAE labels" : k_train,
-        "train MAE" : v_train,
-        "train Frobs" : v_frobs_train,
-    })
-
-    df_test = pd.DataFrame({
-        "test MSE labels" : k_test,
-        "test MAE" : v_test,
-        "test Frobs" : v_frobs_test
-    })
-
-
-    df_train.to_csv(f"{args.model_name}_train.csv", index=False)
-    df_test.to_csv(f"{args.model_name}_test.csv", index=False)
-
-
-
-    assert 1 == 2
-    '''
-    #
     # we stop here because we want to record the Frobenius norm only
     # if we want to implement the post-hoc-train, start here and remove assert
     #
-    cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_name='RankSim_SFT')
+
     #######
-    mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)
+    #mse_avg, l1_avg, loss_gmean = test(model_regression, test_loader, train_labels, args)
+    mse_avg, l1_avg, loss_gmean = test(model_regression, train_loader, train_labels, args)
+    #
+    cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_name='RankSim_SFT')
+    #
+    # just want to test the train MAR
     #
     models = [model_regression,model_linear]
     opts = [opt_regression, opt_linear]
@@ -232,7 +172,7 @@ if __name__ == '__main__':
     print('===================After SFT======================')
     mse_avg, l1_avg, loss_gmean = test(model_regression,test_loader, train_labels, args)
     #
-    cal_per_label_frobs_mae(model_regression, train_loader, test_loader, args.model_name)
+    #cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_name='RankSim_SFT')
 
     #torch.save(model, './MAE.pth')
     # this can be written for SDE-EDG

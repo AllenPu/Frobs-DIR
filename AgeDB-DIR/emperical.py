@@ -35,6 +35,25 @@ def load_model():
     model.encoder.load_state_dict(new_state_dict) 
     return model
 
+''' here is the code to load the RnC model end-to-end
+def build_model(args):
+    model = Regression(name='resnet18')
+    ckpt = torch.load('/home/rpu2/scratch/code/rnc_agedb/last.pth')
+    new_state_dict = OrderedDict()
+    for k,v in ckpt['model'].items():
+        key = k.replace('module.','')
+        keys = key.replace('encoder.','')
+        new_state_dict[keys] =  v
+    model.encoder.load_state_dict(new_state_dict)
+    # load regressor
+    ckpt_regressor =  torch.load('/home/rpu2/scratch/code/rnc_agedb/regressor.pth')                          
+    regressor_state_dict = OrderedDict()
+    for k,v in ckpt_regressor['state_dict'].items():
+        k = '0.' + k
+        regressor_state_dict[k] =  v
+    model.regressor.load_state_dict(regressor_state_dict)
+    return model
+'''
 
 def draw_tsne(protos, model_name):
     label_set = [3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95]  # x轴数据

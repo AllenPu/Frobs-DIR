@@ -130,8 +130,9 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
         x = self.avgpool(x)
+        #encoding = x.view(x.size(0), -1)
         x = torch.flatten(x, 1)
-
+        #  this output a feature instead of a prediction
         return x
     
 
