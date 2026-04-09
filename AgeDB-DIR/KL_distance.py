@@ -1,6 +1,7 @@
 import torch 
+import torch.nn as nn
 
-
+# this loss is from PRIME
 class KLDivergenceLossExplicit(nn.Module):
     def __init__(self, temperature=1.0, eps=1e-8):
         super(KLDivergenceLossExplicit, self).__init__()
