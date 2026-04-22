@@ -158,7 +158,7 @@ if __name__ == '__main__':
     #mse_avg, l1_avg, loss_gmean = test(model_regression, test_loader, train_labels, args)
     mse_avg, l1_avg, loss_gmean = test(model_regression, train_loader, train_labels, args)
     #
-    cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_name='RankSim_SFT')
+    # cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_name='RankSim_SFT')
     #
     # just want to test the train MAR
     #
