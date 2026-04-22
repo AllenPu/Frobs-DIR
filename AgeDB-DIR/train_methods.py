@@ -17,7 +17,7 @@ from model import *
 from utils import cal_per_label_Frob, cal_per_label_mae, cal_per_label_frobs_mae
 from post_hoc_train import post_hoc_train_one_epoch
 from agedb import *
-from model_repo import *
+from model_repo import build_model_from
 
 import os
 os.environ["KMP_WARNINGS"] = "FALSE"
