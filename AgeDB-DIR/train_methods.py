@@ -17,6 +17,7 @@ from model import *
 from utils import cal_per_label_Frob, cal_per_label_mae, cal_per_label_frobs_mae
 from post_hoc_train import post_hoc_train_one_epoch
 from agedb import *
+from model_repo import *
 
 import os
 os.environ["KMP_WARNINGS"] = "FALSE"
@@ -30,7 +31,7 @@ parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('--warm_up_epoch', type=int, default=30)
 parser.add_argument('--epoch', type=int, default=100)
 parser.add_argument('--resume', action='store_true', help='whether use the ptrtrained model')
-parser.add_argument('--model_name', type=str, default='MSE' )
+parser.add_argument('--model_name', type=str, default='MSE', helper='build model from MAE, MSE, + LDS, RankSim, ConR' )
 parser.add_argument('--sft_epoch', type=int, default=1, help='how much epoch used to fine tune the pre-trained model for whole post-hoc')
 parser.add_argument('--linear_epoch', type=int, default=10, help='epoch to train the linear mapping')
 parser.add_argument('--regression_epoch', type=int, default=10, help='SFT epoch in each post-hoc training')
@@ -47,14 +48,15 @@ def build_model(args):
                      start_update=0, start_smooth=1,
                      kernel='gaussian', ks=9, sigma=1, momentum=0.9,
                      return_features=True)
-        # ranksim
-        checkpoint = torch.load('/home/rpu2/scratch/code/ranksim/agedb-dir/checkpoint/agedb_resnet18_reg100.0_il2.0_adam_l1_0.00025_256_2025-09-24-06:52:59.565226/ckpt.best.pth.tar')
-        # Con-R
+        model_path = build_model_from(args.model_name)
+        # Ranksim
+        checkpoint = torch.load(model_path)
+        # ConR
         #checkpoint = torch.load('/home/rpu2/scratch/code/Con-R/agedb-dir/checkpoint/agedb_resnet50ConR_4.0_w=1.0_adam_l1_0.00025_64_2025-09-19-18:36:40.853379/ckpt.best.pth.tar')
         model.load_state_dict(checkpoint['state_dict'], strict=False)
         model.load_state_dict(checkpoint['state_dict'], strict=False)
         print(f"===> Checkpoint '{args.resume}' loaded (epoch [{checkpoint['epoch']}]), testing...")
-        # CR : /home/rpu2/scratch/code/last/pth
+        # CR : /home/rpu2/scratch/code/last.pth
     
     return model
 
@@ -141,6 +143,8 @@ if __name__ == '__main__':
     if not args.resume:
         for e in tqdm(range(args.epoch)):
             model_regression = train_one_epoch(model_regression, train_loader, opt_regression)
+        # save the MSE model
+        #torch.save('/home/rpu2/scratch/code/model_repo/MSE.pth')
     print('==================Before SFT===================')
     #######
     #
