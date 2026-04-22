@@ -23,6 +23,8 @@ import os
 os.environ["KMP_WARNINGS"] = "FALSE"
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print("device is ", device)
+import sys
+print(sys.path)
 
 parser = argparse.ArgumentParser('argument for training')
 parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], help='dataset name')
