@@ -20,7 +20,7 @@ from agedb import *
 
 
 import sys
-print(sys.path)
+print('===',sys.path,'===')
 from model_repo import build_model_from
 
 import os
