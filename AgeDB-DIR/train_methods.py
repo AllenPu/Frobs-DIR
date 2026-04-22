@@ -146,7 +146,6 @@ if __name__ == '__main__':
         # save the MSE model
         #torch.save('/home/rpu2/scratch/code/model_repo/MSE.pth')
     print('==================Before SFT===================')
-    #######
     #
     # We add this to show the train and test MAE
     #
@@ -154,13 +153,12 @@ if __name__ == '__main__':
     # if we want to implement the post-hoc-train, start here and remove assert
     #
 
-    #######
     #mse_avg, l1_avg, loss_gmean = test(model_regression, test_loader, train_labels, args)
     mse_avg, l1_avg, loss_gmean = test(model_regression, train_loader, train_labels, args)
     #
     # cal_per_label_frobs_mae(model_regression, train_loader, test_loader, model_name='RankSim_SFT')
     #
-    # just want to test the train MAR
+    # just want to test the train MAE
     #
     models = [model_regression,model_linear]
     opts = [opt_regression, opt_linear]
