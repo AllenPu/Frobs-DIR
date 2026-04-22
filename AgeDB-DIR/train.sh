@@ -8,12 +8,12 @@
 #    done
 #done
 #####################
-for name in 'ranksim'; do
+for name in 'RankSim', 'ConR', 'MSE', 'MAE', 'MAE_LDS', 'MSE_LDS'; do
     for e in 1 3 5 10 15 20 25 30 35 40; do
         for ee in 1 3 5 7 9 11 13 15 17 19; do
         jobs_name='model_name'_${name}_'regression_epoch'_${e}_'linear_epoch'_${ee}
         echo $jobs_name
-        python train_methods.py --resume --model_name $name --regression_epoch $e --linear_epoch $ee
+        #python train_methods.py --resume --model_name $name --regression_epoch $e --linear_epoch $ee
         done
     done
 done
