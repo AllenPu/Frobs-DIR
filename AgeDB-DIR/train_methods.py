@@ -17,14 +17,17 @@ from model import *
 from utils import cal_per_label_Frob, cal_per_label_mae, cal_per_label_frobs_mae
 from post_hoc_train import post_hoc_train_one_epoch
 from agedb import *
+
+
+import sys
+print(sys.path)
 from model_repo import build_model_from
 
 import os
 os.environ["KMP_WARNINGS"] = "FALSE"
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print("device is ", device)
-import sys
-print(sys.path)
+
 
 parser = argparse.ArgumentParser('argument for training')
 parser.add_argument('--dataset', type=str, default='agedb', choices=['agedb'], help='dataset name')
