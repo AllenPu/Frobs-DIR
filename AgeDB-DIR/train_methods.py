@@ -21,7 +21,7 @@ from agedb import *
 
 import sys
 print('===',sys.path,'===')
-from model_repo import *
+from .model_repo import build_model_from
 
 import os
 os.environ["KMP_WARNINGS"] = "FALSE"
