@@ -166,9 +166,12 @@ class Regression(nn.Module):
         super(Regression, self).__init__()
         backbone, dim_in = model_dict[name]
         #self.encoder = backbone()
-        print(type( backbone()))
-        print(backbone())
-        self.encoder = nn.Sequential(*list(backbone().children())[:-1])
+        #print(type( backbone()))
+        #print(backbone())
+        #self.encoder = nn.Sequential(*list(backbone().children())[:-1])
+        self.encoder = backbone()
+        del self.encoder.linear
+        #
         self.feature_norm = feature_norm
         self.weight_norm = weight_norm
         if self.weight_norm:

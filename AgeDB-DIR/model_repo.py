@@ -42,7 +42,7 @@ def build_models(model_name):
         #model.load_state_dict(checkpoint['state_dict'], strict=False)
     elif model_name in ['MAE', 'MSE', 'MAE_LDS', 'MSE_LDS']:
         #
-        model = torch.load(model_name)
+        model = torch.load(model_path)
     elif model_name in ['SuperCR']:
         #
         model = Regression()
