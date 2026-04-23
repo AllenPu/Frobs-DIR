@@ -28,10 +28,12 @@ def build_model_from(model_name):
 def build_models(model_name):
     model_path = build_model_from(model_name)
     if model_name in ['RankSim', 'ConR']:
-        model = resnet18(fds=False, bucket_num=100, bucket_start=3,
-                     start_update=0, start_smooth=1,
-                     kernel='gaussian', ks=9, sigma=1, momentum=0.9,
-                     return_features=True)
+        # not implement the resnet LDS part
+        #model = resnet18(fds=False, bucket_num=100, bucket_start=3,
+        #             start_update=0, start_smooth=1,
+        #             kernel='gaussian', ks=9, sigma=1, momentum=0.9,
+        #             return_features=True)
+        model = resnet18()
         # Ranksim
         checkpoint = torch.load(model_path)
         # ConR
