@@ -164,7 +164,10 @@ class Regression(nn.Module):
     def __init__(self, name='resnet50', feature_norm=False, weight_norm= False):
         super(Regression, self).__init__()
         backbone, dim_in = model_dict[name]
-        self.encoder = backbone()[:-1]
+        #self.encoder = backbone()
+        print(type( backbone()))
+        print(backbone())
+        self.encoder = backbone()
         self.feature_norm = feature_norm
         self.weight_norm = weight_norm
         if self.weight_norm:
