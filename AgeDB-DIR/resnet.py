@@ -131,8 +131,14 @@ class ResNet(nn.Module):
         x = self.layer4(x)
         x = self.avgpool(x)
         #encoding = x.view(x.size(0), -1)
-        x = torch.flatten(x, 1)
+        ##x = torch.flatten(x, 1)
         #  this output a feature instead of a prediction
+        encoding = x.view(x.size(0), -1)
+
+
+        if self.use_dropout:
+            encoding_s = self.dropout(encoding_s)
+        x = self.linear(encoding_s)
         return x
     
 
@@ -158,7 +164,7 @@ class Regression(nn.Module):
     def __init__(self, name='resnet50', feature_norm=False, weight_norm= False):
         super(Regression, self).__init__()
         backbone, dim_in = model_dict[name]
-        self.encoder = backbone()
+        self.encoder = backbone()[:-1]
         self.feature_norm = feature_norm
         self.weight_norm = weight_norm
         if self.weight_norm:

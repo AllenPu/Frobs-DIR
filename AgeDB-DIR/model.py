@@ -230,6 +230,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
+    #block, layers, in_channel=3, dropout=None, width_per_group=64)
     def __init__(self, block, layers, fds, bucket_num, bucket_start, start_update, start_smooth,
                  kernel, ks, sigma, momentum, dropout=None, return_features=False):
         self.inplanes = 64
