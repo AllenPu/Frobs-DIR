@@ -45,7 +45,7 @@ def build_models(model_name):
         model = torch.load(model_path)
     elif model_name in ['SuperCR']:
         #
-        model = Regression()
+        model = Regression('resnet18')
         #
         model_path_encoder, model_path_regressor = os.path.join(model_path, 'last.pth'), os.path.join(model_path, 'regressor.pth')
         ckpt = torch.load(model_path_encoder)
