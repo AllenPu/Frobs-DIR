@@ -167,7 +167,7 @@ class Regression(nn.Module):
         #self.encoder = backbone()
         print(type( backbone()))
         print(backbone())
-        self.encoder = backbone()
+        self.encoder = nn.Sequential(*list(backbone().children())[:-1])
         self.feature_norm = feature_norm
         self.weight_norm = weight_norm
         if self.weight_norm:
